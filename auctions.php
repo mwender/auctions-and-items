@@ -55,4 +55,5 @@ register_activation_hook( __FILE__, array( $AuctionsAndItems, 'activate' ) );
 
 require_once( 'lib/classes/post_type.item.php' );
 require_once( 'lib/classes/taxonomy.auction.php' );
+require_once( 'lib/classes/auction-importer.php' );
 ?>

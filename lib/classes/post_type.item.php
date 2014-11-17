@@ -86,13 +86,14 @@ class AuctionItem extends AuctionsAndItems{
             'label' => 'Items',
             'labels' => $labels,
             'description' => 'Slides appear on the home page in the "Featured" slider.',
+            'has_archive' => false,
             'public' => true,
             'exclude_from_search' => false,
             'show_ui' => true,
             'hierarchical' => false,
-            'supports' => array( 'title', 'editor', 'custom-fields', 'thumbnail' ),
+            'supports' => array( 'title', 'editor' , 'genesis-seo', 'custom-fields', 'thumbnail' ),
             'menu_position' => 5,
-            'show_in_nav_menus' => false,
+            'show_in_nav_menus' => true,
             'register_meta_box_cb' => array( $this, 'item_metabox_callback' ),
             'menu_icon' => 'dashicons-format-gallery'
         );

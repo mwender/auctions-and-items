@@ -93,6 +93,31 @@ class AuctionTaxonomy extends AuctionsAndItems{
     }
 
     /**
+     * Modify the number of posts that appear on taxonomy auction archives
+     *
+     *
+     *
+     * @see Function/method/class relied on
+     * @link URL short description.
+     * @global type $varname short description.
+     *
+     * @since 1.0.0
+     *
+     * @param type $var Description.
+     * @param type $var Optional. Description.
+     * @return type Description. (@return void if a non-returning function)
+     */
+     public function pre_get_posts( $query ){
+        if( ! $query->is_main_query() )
+            return;
+
+        if( ! is_admin() && is_tax( 'auction' ) ){
+            $query->set( 'posts_per_page', 20 );
+            return;
+        }
+     }
+
+    /**
      * Saving additional meta fields for auctions
      *
      * @since 1.0.0
@@ -159,4 +184,7 @@ add_action( 'admin_enqueue_scripts', array( $AuctionTaxonomy, 'admin_enqueue_scr
 // Handle additional meta fields for auctions
 add_action( 'edited_auction', array( $AuctionTaxonomy,'save_auction_callback' ), 10, 2 );
 add_action( 'delete_auction', array( $AuctionTaxonomy, 'delete_auction_callback' ), 10, 2 );
+
+// Modifying query for taxonomy-auction.php
+add_action( 'pre_get_posts', array( $AuctionTaxonomy, 'pre_get_posts' ) );
 ?>

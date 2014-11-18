@@ -113,6 +113,10 @@ class AuctionTaxonomy extends AuctionsAndItems{
 
         if( ! is_admin() && is_tax( 'auction' ) ){
             $query->set( 'posts_per_page', 20 );
+            $query->set( 'orderby', 'meta_value' );
+            $query->set( 'meta_key', '_lotnum' );
+            $query->set( 'meta_type', 'NUMERIC' );
+            $query->set( 'order', 'ASC' );
             return;
         }
      }

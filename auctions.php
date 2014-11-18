@@ -48,10 +48,18 @@ class AuctionsAndItems {
     /**
     * END CLASS SETUP
     */
+
+    public function wp_enqueue_scripts(){
+        wp_enqueue_style( 'flare-lightbox', plugin_dir_url( __FILE__ ) . 'lib/js/flare/jquery.pixelentity.flare.min.css' );
+        wp_enqueue_script( 'flare-lightbox', plugin_dir_url( __FILE__ ) . 'lib/js/flare/jquery.pixelentity.flare.min.js', array( 'jquery' ) );
+        wp_enqueue_script( 'flare-init', plugin_dir_url( __FILE__ ) . 'lib/js/flare/flare-init.js', array( 'flare-lightbox' ) );
+    }
 }
 
 $AuctionsAndItems = AuctionsAndItems::get_instance();
 register_activation_hook( __FILE__, array( $AuctionsAndItems, 'activate' ) );
+
+add_action( 'wp_enqueue_scripts', array( $AuctionsAndItems, 'wp_enqueue_scripts' ) );
 
 require_once( 'lib/classes/post_type.item.php' );
 require_once( 'lib/classes/taxonomy.auction.php' );

@@ -93,19 +93,12 @@ class AuctionTaxonomy extends AuctionsAndItems{
     }
 
     /**
-     * Modify the number of posts that appear on taxonomy auction archives
-     *
-     *
-     *
-     * @see Function/method/class relied on
-     * @link URL short description.
-     * @global type $varname short description.
+     * Modify the query for `auction` taxonomy and `auction-highlights` post category
      *
      * @since 1.0.0
      *
-     * @param type $var Description.
-     * @param type $var Optional. Description.
-     * @return type Description. (@return void if a non-returning function)
+     * @param object $query WordPress query object.
+     * @return void
      */
      public function pre_get_posts( $query ){
         if( ! $query->is_main_query() )
@@ -117,6 +110,11 @@ class AuctionTaxonomy extends AuctionsAndItems{
             $query->set( 'meta_key', '_lotnum' );
             $query->set( 'meta_type', 'NUMERIC' );
             $query->set( 'order', 'ASC' );
+            return;
+        }
+
+        if( ! is_admin() && is_category( 'auction-highlights' ) ){
+            $query->set( 'posts_per_page', 20 );
             return;
         }
      }

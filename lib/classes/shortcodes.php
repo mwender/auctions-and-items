@@ -42,6 +42,20 @@ class AuctionShortcodes extends AuctionsAndItems{
 		}
 	}
 
+	/**
+	 * Processes [highlights auction="ID"] shortcode
+	 *
+	 * @see get_term()	Retrieves the auction object for use in querying highlights.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array $atts {
+	 *		Array of shortcode attributes.
+	 *
+	 *		@type int $auction Auction taxonomy ID.
+	 * }
+	 * @return string HTML for auction highlights.
+	 */
 	public function highlights_shortcode( $atts ){
 		extract( shortcode_atts( array(
 			'auction' => 0,

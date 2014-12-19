@@ -115,7 +115,7 @@ class AuctionShortcodes extends AuctionsAndItems{
 					if ( empty( $image ) || stristr( $image, 'src=""' ) ) $image = '<img src="' . plugin_dir_url( __FILE__ ) . '../images/placeholder.180x140.jpg" style="width: 100%;" alt="No image found." />';
 					$item_meta = '<h5>Low Estimate: '.$low_est.' &ndash; High Estimate: '.$high_est.'</h5><h5>Realized Price: '.$realized_price.'</h5>';
 
-					$content[] = '<div class="highlight clearfix"><div class="first one-third">' . $image . '</div><div class="two-thirds"><h3><a href="' . get_the_permalink() . '">' . get_the_title() . '</a></h3>'.apply_filters( 'the_content', get_the_content() . $item_meta ).'</div></div>';
+					$content[] = '<div class="highlight clearfix"><div class="first one-third"><a href="' . get_the_permalink() . '" title="' . esc_attr( get_the_title() ) . '">' . $image . '</a></div><div class="two-thirds"><h3><a href="' . get_the_permalink() . '">' . get_the_title() . '</a></h3>'.apply_filters( 'the_content', get_the_content() . $item_meta ).'</div></div>';
 				}
 			} else {
 				$content[] = '<p class="clearfix alert alert-warning" style="text-align: center">No highlighted items found for this auction.</p>';

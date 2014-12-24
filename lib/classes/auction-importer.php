@@ -525,6 +525,11 @@ class AuctionImporter extends AuctionsAndItems{
 				$attachment['ID'] = $attachment_id;
 				$update = true;
 			}
+
+			// Remove unused image sizes from Centric Pro theme
+			remove_image_size( 'featured-page' );
+			remove_image_size( 'featured-post' );
+
 			$attach_id = wp_insert_attachment( $attachment, $imgdir.$image, $post_ID );
 			if ( $update == false ) {
 				require_once ABSPATH . "wp-admin" . '/includes/image.php';

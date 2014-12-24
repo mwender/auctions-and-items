@@ -26,6 +26,29 @@ class AuctionShortcodes extends AuctionsAndItems{
 	private function get_gallery_image( $id = '', $cat_ID = '', $size = 'thumbnail', $return_url = false ) {
 		global $wpdb, $post;
 		if ( empty( $id ) ) $id = $post->ID;
+
+		$args = array(
+			'post_type' => 'attachment',
+			'posts_per_page' => 1,
+			'post_parent' => $id,
+			'post_mime_type' => 'image',
+			'orderby' => 'menu_order',
+			'order' => 'ASC'
+		);
+		$image = get_posts( $args );
+		if( ! $image )
+			return false;
+
+
+		$image_url = wp_get_attachment_url( $image[0]->ID );
+		if( true == $return_url )
+			return $image_url;
+
+		$esc_title = esc_attr( get_the_title( $image[0]->ID ) );
+		$image = '<img src="' . $image_url . '" alt="' . $esc_title . '" title="' . $esc_title . '" />';
+		return $image;
+
+		/*
 		$image = $wpdb->get_row( 'SELECT ID, post_title, post_content, post_parent, guid, menu_order FROM ' . $wpdb->posts . ' WHERE post_parent='.$id.' AND post_type="attachment" AND post_mime_type LIKE "imag%" ORDER BY menu_order' );
 		if ( $image ) {
 			$data = image_get_intermediate_size( $image->ID, $size );
@@ -40,6 +63,7 @@ class AuctionShortcodes extends AuctionsAndItems{
 		} else {
 			return false;
 		}
+		/**/
 	}
 
 	/**
@@ -115,7 +139,7 @@ class AuctionShortcodes extends AuctionsAndItems{
 					if ( empty( $image ) || stristr( $image, 'src=""' ) ) $image = '<img src="' . plugin_dir_url( __FILE__ ) . '../images/placeholder.180x140.jpg" style="width: 100%;" alt="No image found." />';
 					$item_meta = '<h5>Low Estimate: '.$low_est.' &ndash; High Estimate: '.$high_est.'</h5><h5>Realized Price: '.$realized_price.'</h5>';
 
-					$content[] = '<div class="highlight clearfix"><div class="first one-fourth" style="text-align: right;"><a href="' . get_the_permalink() . '" title="' . esc_attr( get_the_title() ) . '">' . $image . '</a></div><div class="three-fourths"><h3><a href="' . get_the_permalink() . '">' . get_the_title() . '</a></h3>'.apply_filters( 'the_content', get_the_content() . $item_meta ).'</div></div>';
+					$content[] = '<div class="highlight clearfix"><div class="first one-third" style=""><a href="' . get_the_permalink() . '" title="' . esc_attr( get_the_title() ) . '">' . $image . '</a></div><div class="two-thirds"><h3><a href="' . get_the_permalink() . '">' . get_the_title() . '</a></h3>'.apply_filters( 'the_content', get_the_content() . $item_meta ).'</div></div>';
 				}
 			} else {
 				$content[] = '<p class="clearfix alert alert-warning" style="text-align: center">No highlighted items found for this auction.</p>';

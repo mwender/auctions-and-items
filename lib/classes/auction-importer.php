@@ -410,7 +410,7 @@ class AuctionImporter extends AuctionsAndItems{
     }
 
 	/**
-	 * Imports an `item` CPT`
+	 * Imports an `item` CPT
 	 *
 	 * @since 1.0.0
 	 *

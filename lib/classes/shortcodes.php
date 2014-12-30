@@ -136,7 +136,9 @@ class AuctionShortcodes extends AuctionsAndItems{
 					$image_fullsize = $this->get_gallery_image( $post->ID, null, 'large', true );
 					if ( !empty( $image_fullsize ) ) $image = '<a href="' . $image_fullsize . '" title="' . get_the_title() . ' - Realized: ' . $realized_price . '" rel="shadowbox[Gallery]">' . $image . '</a>';
 
-					if ( empty( $image ) || stristr( $image, 'src=""' ) ) $image = '<img src="' . plugin_dir_url( __FILE__ ) . '../images/placeholder.180x140.jpg" style="width: 100%;" alt="No image found." />';
+					if ( empty( $image ) || stristr( $image, 'src=""' ) )
+						$image = '<img src="' . plugin_dir_url( __FILE__ ) . '../images/placeholder.180x140.jpg" style="width: 100%;" alt="No image found." />';
+
 					$item_meta = '<h5>Low Estimate: '.$low_est.' &ndash; High Estimate: '.$high_est.'</h5><h5>Realized Price: '.$realized_price.'</h5>';
 
 					$content[] = '<div class="highlight clearfix"><div class="first one-third" style=""><a href="' . get_the_permalink() . '" title="' . esc_attr( get_the_title() ) . '">' . $image . '</a></div><div class="two-thirds"><h3><a href="' . get_the_permalink() . '">' . get_the_title() . '</a></h3>'.apply_filters( 'the_content', get_the_content() . $item_meta ).'</div></div>';

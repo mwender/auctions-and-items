@@ -23,7 +23,7 @@ class AuctionShortcodes extends AuctionsAndItems{
 		return '$'. number_format( str_replace( '$', '', $price ), 2 );
     }
 
-	private function get_gallery_image( $id = '', $cat_ID = '', $size = 'thumbnail', $return_url = false ) {
+	private function get_gallery_image( $id = '', $return_url = false ) {
 		global $wpdb, $post;
 		if ( empty( $id ) ) $id = $post->ID;
 
@@ -44,7 +44,7 @@ class AuctionShortcodes extends AuctionsAndItems{
 		if( true == $return_url )
 			return $image_url;
 
-		$esc_title = esc_attr( get_the_title( $image[0]->ID ) );
+		$esc_title = esc_attr( get_the_title( $id ) );
 		$image = '<img src="' . $image_url . '" alt="' . $esc_title . '" title="' . $esc_title . '" />';
 		return $image;
 	}
@@ -115,9 +115,7 @@ class AuctionShortcodes extends AuctionsAndItems{
 					$high_est = $this->format_price( $high_est );
 
 					$image = '';
-					$image = $this->get_gallery_image( $post->ID, null, 'medium' );
-					$image_fullsize = $this->get_gallery_image( $post->ID, null, 'large', true );
-					if ( !empty( $image_fullsize ) ) $image = '<a href="' . $image_fullsize . '" title="' . get_the_title() . ' - Realized: ' . $realized_price . '" rel="shadowbox[Gallery]">' . $image . '</a>';
+					$image = $this->get_gallery_image( $post->ID );
 
 					if ( empty( $image ) || stristr( $image, 'src=""' ) )
 						$image = '<img src="' . plugin_dir_url( __FILE__ ) . '../images/placeholder.180x140.jpg" style="width: 100%;" alt="No image found." />';

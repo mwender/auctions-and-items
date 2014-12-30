@@ -20,7 +20,7 @@ class AuctionImporter extends AuctionsAndItems{
 
     public function admin_enqueue_scripts( $hook ){
     	if( 'item_page_import-items' == $hook ){
-    		wp_enqueue_script( 'import-csv', plugin_dir_url( __FILE__ ) . '../js/import-csv.js', array( 'jquery', 'media-upload', 'thickbox' ) );
+    		wp_enqueue_script( 'import-csv', plugin_dir_url( __FILE__ ) . '../js/import-csv.js', array( 'jquery', 'media-upload', 'thickbox' ), filemtime( plugin_dir_path( __FILE__ ) . '../js/import-csv.js' ) );
     		wp_localize_script( 'import-csv', 'ajax_vars', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
     		wp_enqueue_style( 'import-csv', plugin_dir_url( __FILE__ ) . '../css/import-csv.css', array(), 1.0, 'screen' );
     	}
@@ -232,7 +232,7 @@ class AuctionImporter extends AuctionsAndItems{
 	 */
     public function auction_import_page(){
 		?>
-		<div class="wrap">
+	<div class="wrap">
 		<h2>Import Auction</h2>
 		<p>For instructions, please click on the "Help" button in the upper right hand corner, underneath your username.</p>
 		<div id="import-progress">
@@ -258,11 +258,14 @@ class AuctionImporter extends AuctionsAndItems{
 			<tbody><tr class="alternate"><td colspan="5" style="text-align: center">One moment. Loading CSV list...</td></tr></tbody>
 		</table>
 
-		<h4>Upload a CSV</h4>
-		<input id="upload_csv" type="text" size="36" name="upload_csv" value="" />
-		<input id="upload_csv_button" type="button" value="Upload CSV" />
-		<br />Upload a CSV file to the server.
+		<div id="upload-csv">
+			<h4>Upload a CSV</h4>
+			<input id="upload_csv" type="text" size="36" name="upload_csv" value="" />
+			<input id="upload_csv_button" type="button" value="Upload CSV" />
+			<br />Upload a CSV file to the server.
 		</div>
+
+	</div>
 		<?php
     }
 

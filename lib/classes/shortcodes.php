@@ -47,23 +47,6 @@ class AuctionShortcodes extends AuctionsAndItems{
 		$esc_title = esc_attr( get_the_title( $image[0]->ID ) );
 		$image = '<img src="' . $image_url . '" alt="' . $esc_title . '" title="' . $esc_title . '" />';
 		return $image;
-
-		/*
-		$image = $wpdb->get_row( 'SELECT ID, post_title, post_content, post_parent, guid, menu_order FROM ' . $wpdb->posts . ' WHERE post_parent='.$id.' AND post_type="attachment" AND post_mime_type LIKE "imag%" ORDER BY menu_order' );
-		if ( $image ) {
-			$data = image_get_intermediate_size( $image->ID, $size );
-			if ( $return_url == true ) {
-				return $data['url'];
-			} else {
-				( isset( $_GET['offset'] ) )? $offset = '?offset='.$_GET['offset'] : $offset = '';
-				( !empty( $cat_ID ) && is_numeric( $cat_ID ) )? $link = get_category_link( $cat_ID ) : $link = get_permalink( $id ).$offset;
-				$image = '<img src="'.$data['url'].'" class="size-thumbnail wp-image-'.$image->ID.'" style="" alt="'.get_the_title( $id ).'" title="'.get_the_title( $id ).'" />';
-				return $image;
-			}
-		} else {
-			return false;
-		}
-		/**/
 	}
 
 	/**

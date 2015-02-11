@@ -122,21 +122,24 @@ class AuctionShortcodes extends AuctionsAndItems{
 
 					$item_meta = '<h5>Low Estimate: '.$low_est.' &ndash; High Estimate: '.$high_est.'</h5><h5>Realized Price: '.$realized_price.'</h5>';
 
-					$content[] = '<div class="highlight clearfix"><div class="first one-third" style=""><a href="' . get_the_permalink() . '" title="' . esc_attr( get_the_title() ) . '">' . $image . '</a></div><div class="two-thirds"><h3><a href="' . get_the_permalink() . '">' . get_the_title() . '</a></h3>'.apply_filters( 'the_content', get_the_content() . $item_meta ).'</div></div>';
+					$content[] = '<div class="highlight clearfix"><div class="first one-third" style=""><a href="' . get_permalink() . '" title="' . esc_attr( get_the_title() ) . '">' . $image . '</a></div><div class="two-thirds"><h3><a href="' . get_permalink() . '">' . get_the_title() . '</a></h3>'.apply_filters( 'the_content', get_the_content() . $item_meta ).'</div></div>';
 				}
 			} else {
 				$content[] = '<p class="clearfix alert alert-warning" style="text-align: center">No highlighted items found for this auction.</p>';
 			}
 
-			if( true == settype( $_GET['flushcache'], 'boolean' ) )
+			if( true == $flushcache )
 				$content[] = '<p class="clearfix" style="text-align: center;"><em>Auction Highlights generated on ' . date( 'l, F jS, Y \a\t g:ia', current_time( 'timestamp' ) ) . '</em></p>';
 
 			$content = implode( "\n", $content );
 			set_transient( 'auction_highlights_' . $auction, $content, 48 * HOUR_IN_SECONDS );
+		} else if( is_user_logged_in() && current_user_can( 'activate_plugins' ) ) {
+			global $post;
+			$content = '<div class="alert alert-warning" style="text-align: center;"><h4><strong>NOTICE:</strong> The highlights shown below have been pulled from cache. If the list appears incomplete, <a href=" ' . get_permalink( $post->ID ) . '?flushcache=true">CLICK HERE</a> to refresh the cache.</h4><p><em>This notice only shows to logged in Case Antiques administrators.</em></p></div>' . $content;
 		}
 
 		if( true == $flushcache )
-			$content.= '<div class="alert alert-warning"><p style="text-align: center;"><em>The cache was flushed.</em></p></div>';
+			$content = '<div class="alert alert-success"><p style="text-align: center;"><strong>SUCCESS:</strong> The cache was flushed.</p></div>' . $content;
 
 		return $content;
 	}

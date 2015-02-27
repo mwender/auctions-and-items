@@ -440,10 +440,6 @@ class AuctionImporter extends AuctionsAndItems{
 		$args = wp_parse_args( $args, $defaults );
 		extract( $args );
 
-
-		if ( $item['Title'] == 'NO LOT' )
-			return;
-
 		$tagitem = true;
 
 		// if this item exists, add the ID to the query so that it gets updated
@@ -456,6 +452,11 @@ class AuctionImporter extends AuctionsAndItems{
 		$post['post_content'] = $item['Description'];
 		$post['post_type'] = 'item';
 		$post['post_status'] = 'publish';
+		$valid_nolot_strings = array( 'no lot', 'nolot', 'no-lot' );
+		foreach( $valid_nolot_strings as $string ){
+			if( stristr( strtolower( $item['Title'] ), $string ) )
+				$post['post_status'] = 'draft';
+		}
 		$post_ID = wp_insert_post( $post );
 
 		// Add this item to an auction

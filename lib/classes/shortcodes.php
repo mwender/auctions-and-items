@@ -18,6 +18,23 @@ class AuctionShortcodes extends AuctionsAndItems{
     * END CLASS SETUP
     */
 
+    public function enqueue_scripts(){
+    	wp_register_style( 'footable', plugin_dir_url( __FILE__ ) . '../../bower_components/footable/css/footable.core.min.css', null, filemtime( plugin_dir_path( __FILE__ ) . '../../bower_components/footable/css/footable.core.min.css' ) );
+    	//wp_register_style( 'footable-metro', plugin_dir_url( __FILE__ ) . '../../bower_components/footable/css/footable.metro.min.css', array( 'footable' ), filemtime( plugin_dir_path( __FILE__ ) . '../../bower_components/footable/css/footable.metro.min.css' ) );
+
+    	wp_register_script( 'footable', plugin_dir_url( __FILE__ ) . '../../bower_components/footable/js/footable.js', array( 'jquery' ), filemtime( plugin_dir_path( __FILE__ ) . '../../bower_components/footable/js/footable.js' ) );
+
+
+    	wp_register_script( 'footable-sort', plugin_dir_url( __FILE__ ) . '../../bower_components/footable/js/footable.sort.js', array( 'jquery', 'footable' ), filemtime( plugin_dir_path( __FILE__ ) . '../../bower_components/footable/js/footable.sort.js' ) );
+
+		wp_register_script( 'footable-filter', plugin_dir_url( __FILE__ ) . '../../bower_components/footable/js/footable.filter.js', array( 'jquery', 'footable' ), filemtime( plugin_dir_path( __FILE__ ) . '../../bower_components/footable/js/footable.filter.js' ) );
+
+		wp_register_script( 'footable-striping', plugin_dir_url( __FILE__ ) . '../../bower_components/footable/js/footable.striping.js', array( 'jquery', 'footable' ), filemtime( plugin_dir_path( __FILE__ ) . '../../bower_components/footable/js/footable.striping.js' ) );
+
+
+    	wp_register_script( 'footable-user', plugin_dir_url( __FILE__ ) . '../js/footable.js' , array( 'jquery', 'footable' ), filemtime( plugin_dir_path( __FILE__ ) . '../js/footable.js' ) );
+    }
+
     public function format_price( $price ){
 		settype( $price, 'int' );
 		return '$'. number_format( str_replace( '$', '', $price ), 2 );
@@ -39,13 +56,19 @@ class AuctionShortcodes extends AuctionsAndItems{
 		if( ! $image )
 			return false;
 
+		$metadata = wp_get_attachment_metadata( $image[0]->ID );
+		if( ! $metadata )
+			return false;
 
-		$image_url = wp_get_attachment_url( $image[0]->ID );
+		$upload_dir = wp_upload_dir();
+
+		$image_url = trailingslashit( $upload_dir['baseurl'] ) . dirname( $metadata['file'] ) . '/' . $metadata['sizes']['medium']['file'];
+
 		if( true == $return_url )
 			return $image_url;
 
 		$esc_title = esc_attr( get_the_title( $id ) );
-		$image = '<img src="' . $image_url . '" alt="' . $esc_title . '" title="' . $esc_title . '" />';
+		$image = '<img src="' . $image_url . '" alt="' . $esc_title . '" title="' . $esc_title . '" style="max-height: 100px; width: auto;" />';
 		return $image;
 	}
 
@@ -64,6 +87,12 @@ class AuctionShortcodes extends AuctionsAndItems{
 	 * @return string HTML for auction highlights.
 	 */
 	public function highlights_shortcode( $atts ){
+		wp_enqueue_style( 'footable' );
+		wp_enqueue_script( 'footable-sort' );
+		wp_enqueue_script( 'footable-filter' );
+		wp_enqueue_script( 'footable-striping' );
+		wp_enqueue_script( 'footable-user' );
+
 		extract( shortcode_atts( array(
 			'auction' => 0,
 		), $atts ) );
@@ -105,8 +134,10 @@ class AuctionShortcodes extends AuctionsAndItems{
 			if( $posts ){
 				global $post;
 
+				$rows = array();
 				foreach( $posts as $post ){
 					setup_postdata( $post );
+					$lotnum = get_post_meta( get_the_ID(), '_lotnum', true );
 					$realized_price = get_post_meta( get_the_ID(), '_realized', true );
 					$realized_price = $this->format_price( $realized_price );
 					$low_est = get_post_meta( get_the_ID(), '_low_est', true );
@@ -122,16 +153,45 @@ class AuctionShortcodes extends AuctionsAndItems{
 
 					$item_meta = '<h5>Low Estimate: '.$low_est.' &ndash; High Estimate: '.$high_est.'</h5><h5>Realized Price: '.$realized_price.'</h5>';
 
-					$content[] = '<div class="highlight clearfix"><div class="first one-third" style=""><a href="' . get_permalink() . '" title="' . esc_attr( get_the_title() ) . '">' . $image . '</a></div><div class="two-thirds"><h3><a href="' . get_permalink() . '">' . get_the_title() . '</a></h3>'.apply_filters( 'the_content', get_the_content() . $item_meta ).'</div></div>';
+					//$content[] = '<div class="highlight clearfix"><div class="first one-third" style=""><a href="' . get_permalink() . '" title="' . esc_attr( get_the_title() ) . '">' . $image . '</a></div><div class="two-thirds"><h3><a href="' . get_permalink() . '">' . get_the_title() . '</a></h3>'.apply_filters( 'the_content', get_the_content() . $item_meta ).'</div></div>';
+					$title = get_the_title();
+					$title = preg_replace( '/Lot\W[0-9]+:\W/', '', $title );
+
+					$desc_image = str_replace( 'style="max-height: 100px; width: auto;"', 'style="max-width: 400px; height: auto;" class="alignleft"', $image );
+
+					$rows[] = '<tr>
+						<td>' . $lotnum . '</td>
+						<td>' . $image . '</td>
+						<td><a href="' . get_permalink() . '" target="_blank">' . $title . '</a></td>
+						<td>' . $desc_image . apply_filters( 'the_content', get_the_content() ) . '</td>
+						<td>'.$realized_price.'</td>
+					</tr>';
 				}
 			} else {
 				$content[] = '<p class="clearfix alert alert-warning" style="text-align: center">No highlighted items found for this auction.</p>';
 			}
 
-			if( true == $flushcache )
-				$content[] = '<p class="clearfix" style="text-align: center;"><em>Auction Highlights generated on ' . date( 'l, F jS, Y \a\t g:ia', current_time( 'timestamp' ) ) . '</em></p>';
-
 			$content = implode( "\n", $content );
+
+			$format_table = '<div class="search-highlights"><label for="search-highlights">Search:</label> <input value="" id="search-highlights"> [<a class="clear-filter" href="#">clear</a>]</div><table class="footable metro-centric-red" data-filter="#search-highlights" data-page-size="4">
+	<colgroup>
+		<col style="width: 10%%" />
+		<col style="width: 20%%" />
+		<col style="width: 55%%" />
+		<col style="width: 15%%" />
+	</colgroup>
+	<thead><tr>
+		<th data-sort-intial="descending" data-hide="phone">Lot No.</th>
+		<th data-sort-ignore="true">Thumbnail</th>
+		<th data-hide="phone,tablet">Title</th>
+		<th data-hide="all">Description</th>
+		<th data-type="numeric">Realized Price</th>
+	</tr></thead>
+	<tbody>%1$s</tbody>
+</table>';
+			$table = sprintf( $format_table, implode( "\n", $rows ) );
+			$content.= $table;
+
 			set_transient( 'auction_highlights_' . $auction, $content, 48 * HOUR_IN_SECONDS );
 		} else if( is_user_logged_in() && current_user_can( 'activate_plugins' ) ) {
 			global $post;
@@ -141,10 +201,14 @@ class AuctionShortcodes extends AuctionsAndItems{
 		if( true == $flushcache )
 			$content = '<div class="alert alert-success"><p style="text-align: center;"><strong>SUCCESS:</strong> The cache was flushed.</p></div>' . $content;
 
+		if( true == $flushcache )
+			$content.= '<p class="clearfix" style="text-align: center;"><em>Auction Highlights generated on ' . date( 'l, F jS, Y \a\t g:ia', current_time( 'timestamp' ) ) . '</em></p>';
+
 		return $content;
 	}
 }
 
 $AuctionShortcodes = AuctionShortcodes::get_instance();
 add_shortcode( 'highlights', array( $AuctionShortcodes, 'highlights_shortcode' ) );
+add_action( 'wp_enqueue_scripts', array( $AuctionShortcodes, 'enqueue_scripts' ) );
 ?>

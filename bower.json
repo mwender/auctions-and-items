@@ -1,0 +1,23 @@
+{
+  "name": "auctions-and-items",
+  "version": "0.0.0",
+  "authors": [
+    "Michael Wender <michael@michaelwender.com>"
+  ],
+  "description": "WordPress plugin for adding Auction taxonomy and Items CPT",
+  "main": "auctions.php",
+  "keywords": [
+    "WordPress"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "footable": "~2.0.3"
+  }
+}

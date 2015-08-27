@@ -68,7 +68,7 @@ class AuctionShortcodes extends AuctionsAndItems{
 			return $image_url;
 
 		$esc_title = esc_attr( get_the_title( $id ) );
-		$image = '<img src="' . $image_url . '" alt="' . $esc_title . '" title="' . $esc_title . '" style="max-height: 100px; width: auto;" />';
+		$image = '<img src="' . $image_url . '" alt="' . $esc_title . '" title="' . $esc_title . '" style="max-height: 50px; width: auto;" />';
 		return $image;
 	}
 
@@ -157,7 +157,7 @@ class AuctionShortcodes extends AuctionsAndItems{
 					$title = get_the_title();
 					$title = preg_replace( '/Lot\W[0-9]+:\W/', '', $title );
 
-					$desc_image = str_replace( 'style="max-height: 100px; width: auto;"', 'style="max-width: 400px; height: auto;" class="alignleft"', $image );
+					$desc_image = str_replace( 'style="max-height: 50px; width: auto;"', 'style="max-width: 400px; height: auto;" class="alignleft"', $image );
 
 					$rows[] = '<tr>
 						<td>' . $lotnum . '</td>
@@ -181,11 +181,11 @@ class AuctionShortcodes extends AuctionsAndItems{
 		<col style="width: 15%%" />
 	</colgroup>
 	<thead><tr>
-		<th data-sort-intial="descending" data-hide="phone">Lot No.</th>
+		<th data-hide="phone" data-type="numeric">Lot No.</th>
 		<th data-sort-ignore="true">Thumbnail</th>
 		<th data-hide="phone,tablet">Title</th>
 		<th data-hide="all">Description</th>
-		<th data-type="numeric">Realized Price</th>
+		<th data-type="numeric" data-sort-initial="descending">Realized Price</th>
 	</tr></thead>
 	<tbody>%1$s</tbody>
 </table>';

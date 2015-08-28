@@ -173,7 +173,7 @@ class AuctionShortcodes extends AuctionsAndItems{
 				$content[] = '<p class="clearfix alert alert-warning" style="text-align: center">No highlighted items found for this auction.</p>';
 			}
 
-			$content = implode( "\n", $content );
+			$content = ( is_array( $content ) )? implode( "\n", $content ) : $content;
 
 			$format_table = '
 <div class="row" style="margin-bottom: 20px;">

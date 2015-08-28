@@ -159,11 +159,13 @@ class AuctionShortcodes extends AuctionsAndItems{
 
 					$desc_image = str_replace( 'style="max-height: 50px; width: auto;"', 'style="max-width: 400px; height: auto;" class="alignleft"', $image );
 
+					$content = get_the_content() . ' [<a href="' . get_permalink() . '" target="_blank">See more photos &rarr;</a>]';
+
 					$rows[] = '<tr>
 						<td>' . $lotnum . '</td>
 						<td>' . $image . '</td>
 						<td><a href="' . get_permalink() . '" target="_blank">' . $title . '</a></td>
-						<td>' . $desc_image . apply_filters( 'the_content', get_the_content() ) . '</td>
+						<td>' . $desc_image . apply_filters( 'the_content', $content ) . '</td>
 						<td>'.$realized_price.'</td>
 					</tr>';
 				}
@@ -173,7 +175,24 @@ class AuctionShortcodes extends AuctionsAndItems{
 
 			$content = implode( "\n", $content );
 
-			$format_table = '<div class="search-highlights"><label for="search-highlights">Search:</label> <input value="" id="search-highlights"> [<a class="clear-filter" href="#">clear</a>]</div><table class="footable metro-centric-red" data-filter="#search-highlights" data-page-size="4">
+			$format_table = '
+<div class="row" style="margin-bottom: 20px;">
+	<div class="col-sm-9 legend">
+		<strong>Legend:</strong> <span class="footable-icon footable-sort-indicator"></span> Click to sort <span class="footable-icon footable-toggle"></span> Click for item description and a link to more photos
+	</div>
+	<div class="col-sm-3" style="text-align: right;">
+		<form class="form-inline">
+			<div class="form-group">
+				<label class="sr-only" for="search-highlights">Search:</label>
+				<div class="input-group" style="width: 100%;">
+					<input type="text" value="" class="form-control input-lg" id="search-highlights" placeholder="Search" />
+					<div class="input-group-addon clear-filter">Clear</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<table class="footable metro-centric-red" data-filter="#search-highlights" data-page-size="4">
 	<colgroup>
 		<col style="width: 10%%" />
 		<col style="width: 20%%" />

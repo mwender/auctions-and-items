@@ -1,5 +1,6 @@
 <?php
 class AuctionShortcodes extends AuctionsAndItems{
+	var $thumbnail_atts = 'style="max-height: 100px; width: auto;"';
 
     private static $instance = null;
 
@@ -68,7 +69,7 @@ class AuctionShortcodes extends AuctionsAndItems{
 			return $image_url;
 
 		$esc_title = esc_attr( get_the_title( $id ) );
-		$image = '<img src="' . $image_url . '" alt="' . $esc_title . '" title="' . $esc_title . '" style="max-height: 50px; width: auto;" />';
+		$image = '<img src="' . $image_url . '" alt="' . $esc_title . '" title="' . $esc_title . '" ' . $this->thumbnail_atts . ' />';
 		return $image;
 	}
 
@@ -157,7 +158,7 @@ class AuctionShortcodes extends AuctionsAndItems{
 					$title = get_the_title();
 					$title = preg_replace( '/Lot\W[0-9]+:\W/', '', $title );
 
-					$desc_image = str_replace( 'style="max-height: 50px; width: auto;"', 'style="max-width: 400px; height: auto;" class="alignleft"', $image );
+					$desc_image = str_replace( $this->thumbnail_atts, 'style="max-width: 400px; height: auto;" class="alignleft"', $image );
 
 					$content = get_the_content() . ' [<a href="' . get_permalink() . '" target="_blank">See more photos &rarr;</a>]';
 

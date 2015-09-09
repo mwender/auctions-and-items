@@ -160,13 +160,13 @@ class AuctionShortcodes extends AuctionsAndItems{
 
 					$desc_image = str_replace( $this->thumbnail_atts, 'style="max-width: 400px; height: auto;" class="alignleft"', $image );
 
-					$content = get_the_content() . ' [<a href="' . get_permalink() . '" target="_blank">See more photos &rarr;</a>]';
+					$item_content = get_the_content() . ' [<a href="' . get_permalink() . '" target="_blank">See more photos &rarr;</a>]';
 
 					$rows[] = '<tr>
 						<td>' . $lotnum . '</td>
 						<td>' . $image . '</td>
 						<td><a href="' . get_permalink() . '" target="_blank">' . $title . '</a></td>
-						<td>' . $desc_image . apply_filters( 'the_content', $content ) . '</td>
+						<td>' . $desc_image . apply_filters( 'the_content', $item_content ) . '</td>
 						<td>'.$realized_price.'</td>
 					</tr>';
 				}

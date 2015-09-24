@@ -37,6 +37,7 @@ class AuctionShortcodes extends AuctionsAndItems{
     }
 
     public function format_price( $price ){
+    public static function format_price( $price ){
 		settype( $price, 'int' );
 		return '$'. number_format( str_replace( '$', '', $price ), 2 );
     }

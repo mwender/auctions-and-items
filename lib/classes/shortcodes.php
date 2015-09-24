@@ -226,6 +226,38 @@ class AuctionShortcodes extends AuctionsAndItems{
 
 		return $content;
 	}
+
+	/**
+	 * Registers bower compenents via `wp_register_script`
+	 *
+	 * @access enqueue_scripts()
+	 * @since 1.x.x
+	 *
+	 * @param array $args
+	 * 			@type string $handle Name for the script.
+	 * 			@type string $src File path to the script.
+	 * 			@type array $deps Array of handles of all registered scripts required by this script.
+	 * 			@type bool $in_footer Should this script be placed in the footer.
+	 * }
+	 * @return void
+	 */
+	private function _register_bower_script( $args ){
+		$defaults = array(
+			'handle' => null,
+			'src' => null,
+			'deps' => null,
+			'in_footer' => null
+		);
+
+		$args = wp_parse_args( $args, $defaults );
+
+		if( ! stristr( $args['src'], '../../bower_components/' ) )
+			$args['src'] = '../../bower_components/' . $args['src'];
+
+	$src_url = plugin_dir_url( __FILE__ ) . $args['src'];
+	$ver = filemtime( plugin_dir_path( __FILE__ ) . $args['src'] );
+	wp_register_script( $args['handle'], $src_url, $args['deps'], $ver, $args['in_footer'] );
+	}
 }
 
 $AuctionShortcodes = AuctionShortcodes::get_instance();

@@ -20,23 +20,51 @@ class AuctionShortcodes extends AuctionsAndItems{
     */
 
     public function enqueue_scripts(){
-    	wp_register_style( 'footable', plugin_dir_url( __FILE__ ) . '../../bower_components/footable/css/footable.core.min.css', null, filemtime( plugin_dir_path( __FILE__ ) . '../../bower_components/footable/css/footable.core.min.css' ) );
-    	//wp_register_style( 'footable-metro', plugin_dir_url( __FILE__ ) . '../../bower_components/footable/css/footable.metro.min.css', array( 'footable' ), filemtime( plugin_dir_path( __FILE__ ) . '../../bower_components/footable/css/footable.metro.min.css' ) );
+    	$styles = array(
+    		0 => array(
+    			'handle' => 'footable',
+    			'src' => 'footable/css/footable.core.min.css',
+    			'type' => 'style',
+			),
+		);
+    	foreach( $styles as $args ){
+    		$this->_register_bower_script( $args );
+    	}
 
-    	wp_register_script( 'footable', plugin_dir_url( __FILE__ ) . '../../bower_components/footable/js/footable.js', array( 'jquery' ), filemtime( plugin_dir_path( __FILE__ ) . '../../bower_components/footable/js/footable.js' ) );
-
-
-    	wp_register_script( 'footable-sort', plugin_dir_url( __FILE__ ) . '../../bower_components/footable/js/footable.sort.js', array( 'jquery', 'footable' ), filemtime( plugin_dir_path( __FILE__ ) . '../../bower_components/footable/js/footable.sort.js' ) );
-
-		wp_register_script( 'footable-filter', plugin_dir_url( __FILE__ ) . '../../bower_components/footable/js/footable.filter.js', array( 'jquery', 'footable' ), filemtime( plugin_dir_path( __FILE__ ) . '../../bower_components/footable/js/footable.filter.js' ) );
-
-		wp_register_script( 'footable-striping', plugin_dir_url( __FILE__ ) . '../../bower_components/footable/js/footable.striping.js', array( 'jquery', 'footable' ), filemtime( plugin_dir_path( __FILE__ ) . '../../bower_components/footable/js/footable.striping.js' ) );
-
+    	$scripts = array(
+    		0 => array(
+    			'handle' => 'datatables',
+    			'src' => 'datatables/media/js/jquery.dataTables.min.js',
+    			'deps' => array( 'jquery' ),
+			),
+			1 => array(
+    			'handle' => 'footable',
+    			'src' => 'footable/js/footable.js',
+    			'deps' => array( 'jquery' ),
+			),
+			2 => array(
+    			'handle' => 'footable-sort',
+    			'src' => 'footable/js/footable.sort.js',
+    			'deps' => array( 'jquery', 'footable' ),
+			),
+			3 => array(
+    			'handle' => 'footable-filter',
+    			'src' => 'footable/js/footable.filter.js',
+    			'deps' => array( 'jquery', 'footable' ),
+			),
+			4 => array(
+    			'handle' => 'footable-striping',
+    			'src' => 'footable/js/footable.striping.js',
+    			'deps' => array( 'jquery', 'footable' ),
+			),
+    	);
+    	foreach( $scripts as $args ){
+    		$this->_register_bower_script( $args );
+    	}
 
     	wp_register_script( 'footable-user', plugin_dir_url( __FILE__ ) . '../js/footable.js' , array( 'jquery', 'footable' ), filemtime( plugin_dir_path( __FILE__ ) . '../js/footable.js' ) );
     }
 
-    public function format_price( $price ){
     public static function format_price( $price ){
 		settype( $price, 'int' );
 		return '$'. number_format( str_replace( '$', '', $price ), 2 );
@@ -229,7 +257,7 @@ class AuctionShortcodes extends AuctionsAndItems{
 	}
 
 	/**
-	 * Registers bower compenents via `wp_register_script`
+	 * Registers bower script compenents via `wp_register_script`
 	 *
 	 * @access enqueue_scripts()
 	 * @since 1.x.x
@@ -247,7 +275,9 @@ class AuctionShortcodes extends AuctionsAndItems{
 			'handle' => null,
 			'src' => null,
 			'deps' => null,
-			'in_footer' => null
+			'in_footer' => null,
+			'media' => 'screen',
+			'type' => 'script',
 		);
 
 		$args = wp_parse_args( $args, $defaults );
@@ -255,9 +285,15 @@ class AuctionShortcodes extends AuctionsAndItems{
 		if( ! stristr( $args['src'], '../../bower_components/' ) )
 			$args['src'] = '../../bower_components/' . $args['src'];
 
-	$src_url = plugin_dir_url( __FILE__ ) . $args['src'];
-	$ver = filemtime( plugin_dir_path( __FILE__ ) . $args['src'] );
-	wp_register_script( $args['handle'], $src_url, $args['deps'], $ver, $args['in_footer'] );
+    	$src_url = plugin_dir_url( __FILE__ ) . $args['src'];
+    	$ver = filemtime( plugin_dir_path( __FILE__ ) . $args['src'] );
+
+    	if( 'script' == $args['type'] ){
+    		wp_register_script( $args['handle'], $src_url, $args['deps'], $ver, $args['in_footer'] );
+    	} elseif ( 'style' == $args['type'] ){
+    		wp_register_style( $args['handle'], $src_url, $args['deps'], $ver, $args['media'] );
+    	}
+
 	}
 }
 

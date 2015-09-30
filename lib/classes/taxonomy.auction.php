@@ -119,6 +119,73 @@ class AuctionTaxonomy extends AuctionsAndItems{
         }
      }
 
+    public function query_items_callback(){
+
+        $response = new stdClass();
+
+        $response->draw = (int) $_POST['draw'];
+
+        $offset = ( isset( $_POST['start'] ) )? $_POST['start'] : 0;
+        $posts_per_page = ( isset( $_POST['length'] ) )? (int) $_POST['length'] : 10;
+        $response->posts_per_page = $posts_per_page;
+
+
+        if( ! isset( $_POST['auction'] ) || empty( $_POST['auction'] ) ){
+            $response->data = array( 'lotnum' => 'n/a', 'image' => 'n/a', 'title' => 'No auction ID!', 'desc' => 'n/a', 'price' => '$0.00' );
+            $response->draw = 1;
+            $response->recordsTotal = 1;
+            $response->recordsFiltered = 1;
+            $response->error = 'No auction ID received!';
+            return $response;
+        }
+        $auction_id = (int) $_POST['auction'];
+        $response->auction_id = $auction_id;
+
+        $args = array(
+            'tax_query' => array(
+                array(
+                    'taxonomy' => 'auction',
+                    'terms' => $auction_id,
+                ),
+            ),
+            'posts_per_page' => $posts_per_page,
+            'offset' => $offset,
+            'order' => 'ASC',
+            'orderby' => 'meta_value_num',
+            'meta_key' => '_lotnum',
+        );
+        $query = new WP_Query( $args );
+        $data = array();
+        if( $query->have_posts() ){
+            $x = 0;
+            while( $query->have_posts() ){
+                $query->the_post();
+                $data[$x]['lotnum'] = get_post_meta( get_the_ID(), '_lotnum', true );
+                $data[$x]['price'] = AuctionShortcodes::format_price( get_post_meta( get_the_ID(), '_realized', true ) );
+
+                $image = AuctionShortcodes::get_gallery_image( get_the_ID() );
+                if ( empty( $image ) || stristr( $image, 'src=""' ) )
+                $image = '<img src="' . plugin_dir_url( __FILE__ ) . '../images/placeholder.180x140.jpg" style="width: 100%;" alt="No image found." />';
+                $data[$x]['image'] = $image;
+
+                $title = get_the_title();
+                $title = preg_replace( '/Lot\W[0-9]+:\W/', '', $title );
+                $data[$x]['title'] = $title;
+
+                $desc_image = str_replace( 'style="max-height: 100px; width: auto;"', 'style="margin-top: 10px; max-width: 400px; height: auto;" class="alignleft"', $image );
+                $item_content = get_the_content() . "\n\n" . ' [<a href="' . get_permalink() . '" target="_blank">See more photos &rarr;</a>]';
+                $data[$x]['desc'] = $desc_image . apply_filters( 'the_content', $item_content );
+
+                $x++;
+            }
+
+            $response->recordsFiltered = (int) $query->found_posts;
+            $response->recordsTotal = (int) $query->found_posts;
+            $response->data = $data;
+        }
+        wp_send_json( $response );
+    }
+
     /**
      * Saving additional meta fields for auctions
      *
@@ -189,4 +256,8 @@ add_action( 'delete_auction', array( $AuctionTaxonomy, 'delete_auction_callback'
 
 // Modifying query for taxonomy-auction.php
 add_action( 'pre_get_posts', array( $AuctionTaxonomy, 'pre_get_posts' ) );
+
+// AJAX calls for Auction DataTables display
+add_action( 'wp_ajax_query_items', array( $AuctionTaxonomy, 'query_items_callback' ) );
+add_action( 'wp_ajax_nopriv_query_items', array( $AuctionTaxonomy, 'query_items_callback' ) );
 ?>

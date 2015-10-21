@@ -15,6 +15,13 @@ class AuctionShortcodes extends AuctionsAndItems{
     private function __construct() {
     }
 
+    public static function get_static( $var = null ){
+    	if( is_null( $var ) )
+    		return false;
+
+    	return self::$$var;
+    }
+
     /**
     * END CLASS SETUP
     */
@@ -27,45 +34,28 @@ class AuctionShortcodes extends AuctionsAndItems{
     			'src' => 'footable/css/footable.core.min.css',
     			'type' => 'style',
 			),
-    		1 => array(
-    			'handle' => 'datatables',
-    			'src' => 'datatables/media/css/jquery.dataTables.min.css',
-    			'type' => 'style',
-			),
 		);
     	foreach( $styles as $args ){
     		$this->_register_bower_script( $args );
     	}
 
-    	wp_register_style( 'datatables-responsive', plugin_dir_url( __FILE__ ) . '../css/datatables.responsive.min.css', array( 'datatables' ), filemtime( plugin_dir_path( __FILE__ ) . '../css/datatables.responsive.min.css' ) );
-
     	$scripts = array(
-    		0 => array(
-    			'handle' => 'datatables',
-    			'src' => 'datatables/media/js/jquery.dataTables.min.js',
-    			'deps' => array( 'jquery' ),
-			),
-    		1 => array(
-    			'handle' => 'datatables-responsive',
-    			'src' => 'datatables-responsive/js/dataTables.responsive.js',
-    			'deps' => array( 'jquery', 'datatables' ),
-			),
-			2 => array(
+			1 => array(
     			'handle' => 'footable',
     			'src' => 'footable/js/footable.js',
     			'deps' => array( 'jquery' ),
 			),
-			3 => array(
+			2 => array(
     			'handle' => 'footable-sort',
     			'src' => 'footable/js/footable.sort.js',
     			'deps' => array( 'jquery', 'footable' ),
 			),
-			4 => array(
+			3 => array(
     			'handle' => 'footable-filter',
     			'src' => 'footable/js/footable.filter.js',
     			'deps' => array( 'jquery', 'footable' ),
 			),
-			5 => array(
+			4 => array(
     			'handle' => 'footable-striping',
     			'src' => 'footable/js/footable.striping.js',
     			'deps' => array( 'jquery', 'footable' ),
@@ -76,7 +66,9 @@ class AuctionShortcodes extends AuctionsAndItems{
     	}
 
     	wp_register_script( 'footable-user', plugin_dir_url( __FILE__ ) . '../js/footable.js' , array( 'jquery', 'footable' ), filemtime( plugin_dir_path( __FILE__ ) . '../js/footable.js' ) );
-    	wp_register_script( 'datatables-user', plugin_dir_url( __FILE__ ) . '../js/datatables.js' , array( 'jquery', 'datatables-responsive' ), filemtime( plugin_dir_path( __FILE__ ) . '../js/datatables.js' ) );
+    	wp_register_script( 'datatables', plugin_dir_url( __FILE__ ) . '../js/datatables/datatables.min.js', null, filemtime( plugin_dir_path( __FILE__ ) . '../js/datatables/datatables.min.js' ) );
+    	wp_register_style( 'datatables', plugin_dir_url( __FILE__ ) . '../js/datatables/datatables.min.css', null, filemtime( plugin_dir_path( __FILE__ ) . '../js/datatables/datatables.min.css' ) );
+    	wp_register_script( 'datatables-user', plugin_dir_url( __FILE__ ) . '../js/datatables.js' , array( 'jquery', 'datatables' ), filemtime( plugin_dir_path( __FILE__ ) . '../js/datatables.js' ) );
     }
 
     public static function format_price( $price ){
@@ -201,7 +193,7 @@ class AuctionShortcodes extends AuctionsAndItems{
 					$title = get_the_title();
 					$title = preg_replace( '/Lot\W[0-9]+:\W/', '', $title );
 
-					$desc_image = str_replace( $this->thumbnail_atts, 'style="max-width: 400px; height: auto;" class="alignleft"', $image );
+					$desc_image = str_replace( self::$thumbnail_atts, 'style="max-width: 400px; height: auto;" class="alignleft"', $image );
 
 					$item_content = get_the_content() . ' [<a href="' . get_permalink() . '" target="_blank">See more photos &rarr;</a>]';
 

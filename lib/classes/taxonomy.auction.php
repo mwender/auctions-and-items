@@ -119,6 +119,13 @@ class AuctionTaxonomy extends AuctionsAndItems{
         }
      }
 
+    /**
+     * Returns JSON formatted query data.
+     *
+     * @since 1.x.x
+     *
+     * @return string JSON formatted auction query data.
+     */
     public function query_items_callback(){
 
         $response = new stdClass();
@@ -128,7 +135,6 @@ class AuctionTaxonomy extends AuctionsAndItems{
         $offset = ( isset( $_POST['start'] ) )? $_POST['start'] : 0;
         $posts_per_page = ( isset( $_POST['length'] ) )? (int) $_POST['length'] : 10;
         $response->posts_per_page = $posts_per_page;
-
 
         if( ! isset( $_POST['auction'] ) || empty( $_POST['auction'] ) ){
             $response->data = array( 'lotnum' => 'n/a', 'image' => 'n/a', 'title' => 'No auction ID!', 'desc' => 'n/a', 'price' => '$0.00' );
@@ -150,10 +156,32 @@ class AuctionTaxonomy extends AuctionsAndItems{
             ),
             'posts_per_page' => $posts_per_page,
             'offset' => $offset,
-            'order' => 'ASC',
-            'orderby' => 'meta_value_num',
-            'meta_key' => '_lotnum',
         );
+
+        // Sorting
+        $cols = array( 1 => '_lotnum', 3 => 'title', 5 => '_realized' );
+        $order_key = ( isset( $_POST['order'][0]['column'] ) && array_key_exists( $_POST['order'][0]['column'], $cols ) )? $_POST['order'][0]['column'] : 1;
+        $response->order_key = $cols[$order_key];
+
+        switch( $response->order_key ){
+            case 'title':
+                $args['orderby'] = 'title';
+            break;
+            default:
+                $args['orderby'] = 'meta_value_num';
+                $args['meta_key'] = $response->order_key;
+            break;
+        }
+
+        $response->order = strtoupper( $_POST['order'][0]['dir'] );
+        $args['order'] = ( isset( $response->order ) )? $response->order : 'ASC';
+
+        // Search
+        if( isset( $_POST['search']['value'] ) ){
+            $args['s'] = $_POST['search']['value'];
+            $response->search_value = $args['s'];
+        }
+
         $query = new WP_Query( $args );
         $data = array();
         if( $query->have_posts() ){
@@ -169,10 +197,11 @@ class AuctionTaxonomy extends AuctionsAndItems{
                 $data[$x]['image'] = $image;
 
                 $title = get_the_title();
-                $title = preg_replace( '/Lot\W[0-9]+:\W/', '', $title );
+                //$title = preg_replace( '/Lot\W[0-9]+:\W/', '', $title ); // Remove `Lot #:` from title
                 $data[$x]['title'] = $title;
 
-                $desc_image = str_replace( 'style="max-height: 100px; width: auto;"', 'style="margin-top: 10px; max-width: 400px; height: auto;" class="alignleft"', $image );
+                $replace = AuctionShortcodes::get_static( 'thumbnail_atts' );
+                $desc_image = str_replace( $replace, 'style="margin-top: 10px; max-width: 400px; height: auto;" class="alignleft"', $image );
                 $item_content = get_the_content() . "\n\n" . ' [<a href="' . get_permalink() . '" target="_blank">See more photos &rarr;</a>]';
                 $data[$x]['desc'] = $desc_image . apply_filters( 'the_content', $item_content );
 

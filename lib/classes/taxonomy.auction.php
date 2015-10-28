@@ -122,7 +122,7 @@ class AuctionTaxonomy extends AuctionsAndItems{
     /**
      * Returns JSON formatted query data as per a DataTables request.
      *
-     * The following method has been built to work with data sent
+     * This method has been built to work with data sent
      * by datatables.js. In particular, this function receives the
      * following $_POST vars:
      *
@@ -142,14 +142,10 @@ class AuctionTaxonomy extends AuctionsAndItems{
      */
     public function query_items_callback(){
 
-        $response = new stdClass();
+        $response = new stdClass(); // returned as JSON
+        $args = array(); // passed to WP_Query( $args )
 
-        $response->draw = (int) $_POST['draw'];
-
-        $offset = ( isset( $_POST['start'] ) )? $_POST['start'] : 0;
-        $posts_per_page = ( isset( $_POST['length'] ) )? (int) $_POST['length'] : 10;
-        $response->posts_per_page = $posts_per_page;
-
+        // Which auction are we viewing?
         if( ! isset( $_POST['auction'] ) || empty( $_POST['auction'] ) ){
             $response->data = array( 'lotnum' => 'n/a', 'image' => 'n/a', 'title' => 'No auction ID!', 'desc' => 'n/a', 'price' => '$0.00' );
             $response->draw = 1;
@@ -158,21 +154,22 @@ class AuctionTaxonomy extends AuctionsAndItems{
             $response->error = 'No auction ID received!';
             return $response;
         }
-        $auction_id = (int) $_POST['auction'];
-        $response->auction_id = $auction_id;
-
-        $args = array(
-            'tax_query' => array(
-                array(
-                    'taxonomy' => 'auction',
-                    'terms' => $auction_id,
-                ),
+        $response->auction_id = (int) $_POST['auction'];
+        $args['tax_query'] = array(
+            array(
+                'taxonomy' => 'auction',
+                'terms' => $response->auction_id,
             ),
-            'posts_per_page' => $posts_per_page,
-            'offset' => $offset,
         );
 
-        // Sorting
+        // Paging and offset
+        $response->offset = ( isset( $_POST['start'] ) )? $_POST['start'] : 0;
+        $args['offset'] = $response->offset;
+
+        $response->posts_per_page = ( isset( $_POST['length'] ) )? (int) $_POST['length'] : 10;
+        $args['posts_per_page'] = $response->posts_per_page;
+
+        // Orderby
         $cols = array( 1 => '_lotnum', 3 => 'title', 5 => '_realized' );
         $order_key = ( isset( $_POST['order'][0]['column'] ) && array_key_exists( $_POST['order'][0]['column'], $cols ) )? $_POST['order'][0]['column'] : 1;
         $response->order_key = $cols[$order_key];
@@ -187,13 +184,14 @@ class AuctionTaxonomy extends AuctionsAndItems{
             break;
         }
 
+        // Sorting (ASC||DESC)
         $response->order = strtoupper( $_POST['order'][0]['dir'] );
         $args['order'] = ( isset( $response->order ) )? $response->order : 'ASC';
 
         // Search
         if( isset( $_POST['search']['value'] ) ){
             $args['s'] = $_POST['search']['value'];
-            $response->search_value = $args['s'];
+            $response->s = $args['s'];
         }
 
         $query = new WP_Query( $args );

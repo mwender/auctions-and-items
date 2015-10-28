@@ -120,7 +120,21 @@ class AuctionTaxonomy extends AuctionsAndItems{
      }
 
     /**
-     * Returns JSON formatted query data.
+     * Returns JSON formatted query data as per a DataTables request.
+     *
+     * The following method has been built to work with data sent
+     * by datatables.js. In particular, this function receives the
+     * following $_POST vars:
+     *
+     *  @type int $start - Paging first record indicator, maps to $wp_query->$args->$offset.
+     *  @type int $length - Number of records for the table to display, maps to $wp_query->$args->$post_per_page.
+     *  @type int $auction - The WP taxonomy ID for the queried auction, maps to $wp_query->$args->$tax_query->$terms.
+     *  @type int $order[0]['column'] - The column which specifies $wp_query->$args->$orderby.
+     *  @type str $order[0]['dir'] - Sort by ASC|DESC, maps to $wp_query->$args->$order.
+     *  @type str $search['value'] - Search string, maps to $wp_query->$args->$s.
+     *
+     * For more info, see the [DataTables Server-side Processing docs]
+     * (http://datatables.net/manual/server-side).
      *
      * @since 1.x.x
      *

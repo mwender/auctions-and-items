@@ -126,6 +126,8 @@ class AuctionTaxonomy extends AuctionsAndItems{
      * by datatables.js. In particular, this function receives the
      * following $_POST vars:
      *
+     *  @type int $draw - Draw counter. This is used by DataTables to ensure that the Ajax returns from server-side
+     *      processing requests are drawn in sequence by DataTables.
      *  @type int $start - Paging first record indicator, maps to $wp_query->$args->$offset.
      *  @type int $length - Number of records for the table to display, maps to $wp_query->$args->$post_per_page.
      *  @type int $auction - The WP taxonomy ID for the queried auction, maps to $wp_query->$args->$tax_query->$terms.
@@ -144,6 +146,8 @@ class AuctionTaxonomy extends AuctionsAndItems{
 
         $response = new stdClass(); // returned as JSON
         $args = array(); // passed to WP_Query( $args )
+
+        $response->draw = $_POST['draw']; // $draw == 1 for the first request when the page is requested
 
         // Which auction are we viewing?
         if( ! isset( $_POST['auction'] ) || empty( $_POST['auction'] ) ){
@@ -169,10 +173,26 @@ class AuctionTaxonomy extends AuctionsAndItems{
         $response->posts_per_page = ( isset( $_POST['length'] ) )? (int) $_POST['length'] : 10;
         $args['posts_per_page'] = $response->posts_per_page;
 
+        $response->past = $_POST['past'];
+
+        // Orderby && Sorting for Initial Page Load:
+        // If $response->draw == 1, then this is the
+        // first query. Then we check $response->past to see if this auction is in the past.
+        // If `true`, then we sort by `_realized`, DESC.
+        if( 1 == $response->draw ){
+            // This is a `past` auction, sort by Realized Price, DESC.
+            if( 1 == $response->past ){
+                $response->order = 'DESC';
+                $response->order_key = '_realized';
+            }
+        }
+
         // Orderby
-        $cols = array( 1 => '_lotnum', 3 => 'title', 5 => '_realized' );
-        $order_key = ( isset( $_POST['order'][0]['column'] ) && array_key_exists( $_POST['order'][0]['column'], $cols ) )? $_POST['order'][0]['column'] : 1;
-        $response->order_key = $cols[$order_key];
+        if( ! isset( $response->order_key ) ){
+            $cols = array( 1 => '_lotnum', 3 => 'title', 5 => '_realized' );
+            $order_key = ( isset( $_POST['order'][0]['column'] ) && array_key_exists( $_POST['order'][0]['column'], $cols ) )? $_POST['order'][0]['column'] : 1;
+            $response->order_key = $cols[$order_key];
+        }
 
         switch( $response->order_key ){
             case 'title':
@@ -185,7 +205,8 @@ class AuctionTaxonomy extends AuctionsAndItems{
         }
 
         // Sorting (ASC||DESC)
-        $response->order = strtoupper( $_POST['order'][0]['dir'] );
+        if( ! isset( $response->order ) )
+            $response->order = strtoupper( $_POST['order'][0]['dir'] );
         $args['order'] = ( isset( $response->order ) )? $response->order : 'ASC';
 
         // Search

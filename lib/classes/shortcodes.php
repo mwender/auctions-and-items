@@ -26,51 +26,6 @@ class AuctionShortcodes extends AuctionsAndItems{
     * END CLASS SETUP
     */
 
-    //* TODO: Move this into AuctionsAndItems class
-    public function enqueue_scripts(){
-    	$styles = array(
-    		0 => array(
-    			'handle' => 'footable',
-    			'src' => 'footable/css/footable.core.min.css',
-    			'type' => 'style',
-			),
-		);
-    	foreach( $styles as $args ){
-    		$this->_register_bower_script( $args );
-    	}
-
-    	$scripts = array(
-			1 => array(
-    			'handle' => 'footable',
-    			'src' => 'footable/js/footable.js',
-    			'deps' => array( 'jquery' ),
-			),
-			2 => array(
-    			'handle' => 'footable-sort',
-    			'src' => 'footable/js/footable.sort.js',
-    			'deps' => array( 'jquery', 'footable' ),
-			),
-			3 => array(
-    			'handle' => 'footable-filter',
-    			'src' => 'footable/js/footable.filter.js',
-    			'deps' => array( 'jquery', 'footable' ),
-			),
-			4 => array(
-    			'handle' => 'footable-striping',
-    			'src' => 'footable/js/footable.striping.js',
-    			'deps' => array( 'jquery', 'footable' ),
-			),
-    	);
-    	foreach( $scripts as $args ){
-    		$this->_register_bower_script( $args );
-    	}
-
-    	wp_register_script( 'footable-user', plugin_dir_url( __FILE__ ) . '../js/footable.js' , array( 'jquery', 'footable' ), filemtime( plugin_dir_path( __FILE__ ) . '../js/footable.js' ) );
-    	wp_register_script( 'datatables', plugin_dir_url( __FILE__ ) . '../js/datatables/datatables.min.js', null, filemtime( plugin_dir_path( __FILE__ ) . '../js/datatables/datatables.min.js' ) );
-    	wp_register_style( 'datatables', plugin_dir_url( __FILE__ ) . '../js/datatables/datatables.min.css', null, filemtime( plugin_dir_path( __FILE__ ) . '../js/datatables/datatables.min.css' ) );
-    	wp_register_script( 'datatables-user', plugin_dir_url( __FILE__ ) . '../js/datatables.js' , array( 'jquery', 'datatables' ), filemtime( plugin_dir_path( __FILE__ ) . '../js/datatables.js' ) );
-    }
-
     public static function format_price( $price ){
 		settype( $price, 'int' );
 		return '$'. number_format( str_replace( '$', '', $price ), 2 );
@@ -261,49 +216,8 @@ class AuctionShortcodes extends AuctionsAndItems{
 
 		return $content;
 	}
-
-	/**
-	 * Registers bower script compenents via `wp_register_script`
-	 *
-	 * @access enqueue_scripts()
-	 * @since 1.x.x
-	 *
-	 * @param array $args
-	 * 			@type string $handle Name for the script.
-	 * 			@type string $src File path to the script.
-	 * 			@type array $deps Array of handles of all registered scripts required by this script.
-	 * 			@type bool $in_footer Should this script be placed in the footer.
-	 * }
-	 * @return void
-	 */
-	private function _register_bower_script( $args ){
-		$defaults = array(
-			'handle' => null,
-			'src' => null,
-			'deps' => null,
-			'in_footer' => null,
-			'media' => 'screen',
-			'type' => 'script',
-		);
-
-		$args = wp_parse_args( $args, $defaults );
-
-		if( ! stristr( $args['src'], '../../bower_components/' ) )
-			$args['src'] = '../../bower_components/' . $args['src'];
-
-    	$src_url = plugin_dir_url( __FILE__ ) . $args['src'];
-    	$ver = filemtime( plugin_dir_path( __FILE__ ) . $args['src'] );
-
-    	if( 'script' == $args['type'] ){
-    		wp_register_script( $args['handle'], $src_url, $args['deps'], $ver, $args['in_footer'] );
-    	} elseif ( 'style' == $args['type'] ){
-    		wp_register_style( $args['handle'], $src_url, $args['deps'], $ver, $args['media'] );
-    	}
-
-	}
 }
 
 $AuctionShortcodes = AuctionShortcodes::get_instance();
 add_shortcode( 'highlights', array( $AuctionShortcodes, 'highlights_shortcode' ) );
-add_action( 'wp_enqueue_scripts', array( $AuctionShortcodes, 'enqueue_scripts' ) );
 ?>

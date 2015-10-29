@@ -173,20 +173,6 @@ class AuctionTaxonomy extends AuctionsAndItems{
         $response->posts_per_page = ( isset( $_POST['length'] ) )? (int) $_POST['length'] : 10;
         $args['posts_per_page'] = $response->posts_per_page;
 
-        $response->past = $_POST['past'];
-
-        // Orderby && Sorting for Initial Page Load:
-        // If $response->draw == 1, then this is the
-        // first query. Then we check $response->past to see if this auction is in the past.
-        // If `true`, then we sort by `_realized`, DESC.
-        if( 1 == $response->draw ){
-            // This is a `past` auction, sort by Realized Price, DESC.
-            if( 1 == $response->past ){
-                $response->order = 'DESC';
-                $response->order_key = '_realized';
-            }
-        }
-
         // Orderby
         if( ! isset( $response->order_key ) ){
             $cols = array( 1 => '_lotnum', 3 => 'title', 5 => '_realized' );

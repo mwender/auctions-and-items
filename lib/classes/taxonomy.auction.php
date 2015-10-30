@@ -224,6 +224,17 @@ class AuctionTaxonomy extends AuctionsAndItems{
                 $item_content = get_the_content() . "\n\n" . ' [<a href="' . get_permalink() . '" target="_blank">See more photos &rarr;</a>]';
                 $data[$x]['desc'] = $desc_image . apply_filters( 'the_content', $item_content );
 
+                // Thumbnail
+                $img = genesis_get_image( array(
+                    'format'  => 'html',
+                    'size'    => genesis_get_option( 'image_size' ),
+                    'context' => 'archive',
+                    'attr'    => genesis_parse_attr( 'entry-image', array ( 'alt' => get_the_title() ) ),
+                ) );
+                $permalink = get_permalink();
+                $data[$x]['thumbnail'] = sprintf( '<div class="image-frame"><span class="helper"></span><a href="%1$s" aria-hidden="true">%2$s</a></div><h2 class="entry-title"><a href="%4$s">%3$s</a></h2>', $permalink, $img, $title, $permalink );
+
+
                 $x++;
             }
 

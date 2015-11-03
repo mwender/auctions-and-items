@@ -65,6 +65,29 @@ class AuctionTaxonomy extends AuctionsAndItems{
     }
 
     /**
+     * Hooked to `wp_title` and `aioseop_title`. Filters title for Auction Archives.
+     *
+     * @since 1.x.x
+     *
+     * @param string $title Page title tag content.
+     * @return string Auction title with date converted to `l, F j, Y` format.
+     */
+    public function filter_title( $title ){
+        if( ! is_tax( 'auction' ) )
+            return $title;
+
+        preg_match( '/([0-9]{4})\s([0-9]{2})\s([0-9]{2})/', $title, $matches );
+        if( $matches ){
+            $auction_timestamp = strtotime( $matches[1] . '-' . $matches[2] . '-' .$matches[3] );
+            $auction_date = date( 'l, F j, Y', $auction_timestamp );
+            $title = str_replace( $matches[0], $auction_date, $title );
+        }
+        $title = str_replace( 'Auctions ', '', $title );
+
+        return $title;
+    }
+
+    /**
      * Hooked to WordPress `init` action.
      *
      * Performs the following:
@@ -315,6 +338,10 @@ add_action( 'delete_auction', array( $AuctionTaxonomy, 'delete_auction_callback'
 
 // Modifying query for taxonomy-auction.php
 add_action( 'pre_get_posts', array( $AuctionTaxonomy, 'pre_get_posts' ) );
+
+// Filtering auction archive <title>
+add_filter( 'wp_title', array( $AuctionTaxonomy, 'filter_title' ), 99, 1 );
+add_filter( 'aioseop_title', array( $AuctionTaxonomy, 'filter_title' ), 99, 1 );
 
 // AJAX calls for Auction DataTables display
 add_action( 'wp_ajax_query_items', array( $AuctionTaxonomy, 'query_items_callback' ) );

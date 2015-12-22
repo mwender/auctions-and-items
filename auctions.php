@@ -69,15 +69,17 @@ class AuctionsAndItems {
             $current_term = get_term_by('slug',$value,$wp_query->query_vars['taxonomy']);
 
             // Get the date of the current auction
-            $auction_name = $current_term->name;
-            preg_match( '/([0-9]{4})\s([0-9]{2})\s([0-9]{2})/', $auction_name, $matches );
+            //$auction_name = $current_term->name;
+            //preg_match( '/([0-9]{4})\s([0-9]{2})\s([0-9]{2})/', $auction_name, $matches );
+
+            $date = get_metadata( 'auction', $current_term->term_id, 'date', true );
             $past = false;
-            if( $matches ){
-                $auction_datetime = new DateTime( $matches[1] . '-' . $matches[2] . '-' .$matches[3] );
+            if( $date ){
+                $auction_datetime = new DateTime( $date );
                 $current_datetime = new DateTime( current_time( 'Y-m-d' ) );
                 $interval = $auction_datetime->diff( $current_datetime );
                 $diff = $interval->format( '%R%a' );
-                if( 0 < $diff )
+                if( 7 < $diff )
                     $past = true;
             }
 

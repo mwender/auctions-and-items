@@ -171,6 +171,7 @@ class AuctionTaxonomy extends AuctionsAndItems{
         $args = array(); // passed to WP_Query( $args )
 
         $response->draw = $_POST['draw']; // $draw == 1 for the first request when the page is requested
+        $response->past = $_POST['past'];
 
         // Which auction are we viewing?
         if( ! isset( $_POST['auction'] ) || empty( $_POST['auction'] ) ){

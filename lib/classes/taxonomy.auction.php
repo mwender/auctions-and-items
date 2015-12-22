@@ -199,7 +199,12 @@ class AuctionTaxonomy extends AuctionsAndItems{
 
         // Orderby
         if( ! isset( $response->order_key ) ){
+
             $cols = array( 1 => '_lotnum', 3 => 'title', 5 => '_realized' );
+            if( 0 == $response->past ){
+                $cols[5] = '_low_est';
+                $cols[6] = '_high_est';
+            }
             $order_key = ( isset( $_POST['order'][0]['column'] ) && array_key_exists( $_POST['order'][0]['column'], $cols ) )? $_POST['order'][0]['column'] : 1;
             $response->order_key = $cols[$order_key];
         }
@@ -233,6 +238,8 @@ class AuctionTaxonomy extends AuctionsAndItems{
                 $query->the_post();
                 $data[$x]['lotnum'] = get_post_meta( get_the_ID(), '_lotnum', true );
                 $data[$x]['price'] = AuctionShortcodes::format_price( get_post_meta( get_the_ID(), '_realized', true ) );
+                $data[$x]['low_est'] = AuctionShortcodes::format_price( get_post_meta( get_the_ID(), '_low_est', true ) );
+                $data[$x]['high_est'] = AuctionShortcodes::format_price( get_post_meta( get_the_ID(), '_high_est', true ) );
 
                 $image = AuctionShortcodes::get_gallery_image( get_the_ID() );
                 if ( empty( $image ) || stristr( $image, 'src=""' ) )

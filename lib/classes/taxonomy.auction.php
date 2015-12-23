@@ -286,6 +286,7 @@ class AuctionTaxonomy extends AuctionsAndItems{
      * @return void
      */
     public function save_auction_callback( $term_id, $tt_id ){
+        //wp_die('<pre>$_POST = ' . print_r( $_POST, true ) . '</pre>');
         if ( defined( 'DOING_AJAX' ) && DOING_AJAX )
             return;
 
@@ -300,6 +301,9 @@ class AuctionTaxonomy extends AuctionsAndItems{
 
         if ( isset( $_POST['date'] ) && !empty( $_POST['date'] ) )
             update_metadata( $_POST['taxonomy'], $term_id, 'date', $_POST['date'] );
+
+        $show_realized = ( isset( $_POST['show_realized'] ) )? $_POST['show_realized'] : 0 ;
+        update_metadata( $_POST['taxonomy'], $term_id, 'show_realized', $_POST['show_realized'] );
     }
 
     /**
@@ -312,6 +316,7 @@ class AuctionTaxonomy extends AuctionsAndItems{
     public function taxonomy_archive_options_for_auction( $tag, $taxonomy ){
         $meta = get_metadata( $tag->taxonomy, $tag->term_id, 'meta', true );
         $date = get_metadata( $tag->taxonomy, $tag->term_id, 'date', true );
+        $show_realized = get_metadata( $tag->taxonomy, $tag->term_id, 'show_realized', true );
     ?>
         <input type="hidden" name="auction_nonce" value="<?php echo wp_create_nonce( basename( __FILE__ ) )?>" />
         <h3><?php echo __( 'Auction Archive Settings', 'caseanti' ); ?></h3>
@@ -320,6 +325,10 @@ class AuctionTaxonomy extends AuctionsAndItems{
                 <tr>
                     <th scope="row"><label>Date</label></th>
                     <td><input class="datepicker" id="date" type="text" name="date" value="<?php echo $date ?>" /><div class="description">Select the date of this auction.</div></td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="show_realized">Display Realized Prices?</label></th>
+                    <td><input value="1" type="checkbox" id="show_realized" name="show_realized" <?php checked( $show_realized ) ?> /> <label for="show_realized">Show the <em>Realized Prices</em> column instead of the <em>Low/High Estimate</em> columns when viewing this auction's table view?</label></td>
                 </tr>
                 <tr>
                     <th scope="row" valign="top"><label for="meta[auction_id]"><?php _e( 'Live Auctioneers Auction ID', 'caseanti' ); ?></label></th>

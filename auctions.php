@@ -68,22 +68,9 @@ class AuctionsAndItems {
             $value    = get_query_var($wp_query->query_vars['taxonomy']);
             $current_term = get_term_by('slug',$value,$wp_query->query_vars['taxonomy']);
 
-            // Get the date of the current auction
-            //$auction_name = $current_term->name;
-            //preg_match( '/([0-9]{4})\s([0-9]{2})\s([0-9]{2})/', $auction_name, $matches );
+            $show_realized = get_metadata( 'auction', $current_term->term_id, 'show_realized', true );
 
-            $date = get_metadata( 'auction', $current_term->term_id, 'date', true );
-            $past = false;
-            if( $date ){
-                $auction_datetime = new DateTime( $date );
-                $current_datetime = new DateTime( current_time( 'Y-m-d' ) );
-                $interval = $auction_datetime->diff( $current_datetime );
-                $diff = $interval->format( '%R%a' );
-                if( 7 < $diff )
-                    $past = true;
-            }
-
-            wp_localize_script( 'datatables-user', 'wpvars', array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'auction' => $current_term->term_id, 'past' => $past ) );
+            wp_localize_script( 'datatables-user', 'wpvars', array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'auction' => $current_term->term_id, 'show_realized' => $show_realized ) );
             wp_enqueue_style( 'datatables' );
             wp_enqueue_style( 'dashicons' );
         }

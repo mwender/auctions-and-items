@@ -171,7 +171,7 @@ class AuctionTaxonomy extends AuctionsAndItems{
         $args = array(); // passed to WP_Query( $args )
 
         $response->draw = $_POST['draw']; // $draw == 1 for the first request when the page is requested
-        $response->past = $_POST['past'];
+        $response->show_realized = $_POST['show_realized'];
 
         // Which auction are we viewing?
         if( ! isset( $_POST['auction'] ) || empty( $_POST['auction'] ) ){
@@ -201,7 +201,7 @@ class AuctionTaxonomy extends AuctionsAndItems{
         if( ! isset( $response->order_key ) ){
 
             $cols = array( 1 => '_lotnum', 3 => 'title', 5 => '_realized' );
-            if( 0 == $response->past ){
+            if( false == $response->show_realized ){
                 $cols[5] = '_low_est';
                 $cols[6] = '_high_est';
             }

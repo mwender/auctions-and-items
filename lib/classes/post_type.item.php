@@ -13,11 +13,118 @@ class AuctionItem extends AuctionsAndItems{
     }
 
     private function __construct() {
+        add_filter( 'get_next_post_join', function( $join ){
+            return $this->item_nextprev_item_sql( array( 'type' => 'join', 'sql' => $join ) );
+        }, 999 );
+        add_filter( 'get_next_post_where', function( $where ){
+            return $this->item_nextprev_item_sql( array( 'type' => 'where', 'sql' => $where ) );
+        }, 999 );
+        add_filter( 'get_next_post_sort', function(){
+            return $this->item_orderby_sql( array( 'sort' => 'ASC' ) );
+        }, 999 );
+
+        add_filter( 'get_previous_post_join', function( $join ){
+            return $this->item_nextprev_item_sql( array( 'type' => 'join', 'sql' => $join ) );
+        }, 999 );
+        add_filter( 'get_previous_post_where', function( $where ){
+            return $this->item_nextprev_item_sql( array( 'type' => 'where', 'sql' => $where, 'compare' => '<' ) );
+        }, 999 );
+        add_filter( 'get_previous_post_sort', function(){
+            return $this->item_orderby_sql( array( 'sort' => 'DESC' ) );
+        }, 999 );
     }
 
     /**
     * END CLASS SETUP
     */
+
+    /**
+     * Builds SQL for filtering get_adjacent_post for `item` CPT.
+     *
+     * @see get_post_meta()
+     * @see get_meta_sql()
+     * @global object $post Global WordPress post object.
+     * @global object $wpdb Global WordPress database object.
+     *
+     * @since 1.0.1
+     *
+     * @param array $args {
+     *      Array of arguments.
+     *
+     *      @type string $compare Either `>` or `<`.
+     *      @type string $sql SQL passed from filter during callback.
+     *      @type string $type Either `where` or `join`. Used to specify which part of
+     *          the array returned by get_meta_sql() that we want returned.
+     * }
+     * @return string SQL used to filter get_{$adjacent}_post_join, get_{$adjacent}_post_where, and get_{$adjacent}_post_sort.
+     */
+    public function item_nextprev_item_sql( $args ){
+
+        global $post, $wpdb;
+
+        $args = shortcode_atts( array(
+            'compare' => '>',
+            'sql' => null,
+            'type' => null,
+        ), $args );
+
+        if( is_null( $args['type'] ) )
+            return false;
+
+        $current_lotnum = get_post_meta( $post->ID, '_lotnum', true );
+
+        $meta_query = array(
+            array(
+                'key' => '_lotnum',
+                'value' => $current_lotnum,
+                'compare' => $args['compare'],
+                'type' => 'NUMERIC',
+
+            ),
+        );
+        $meta_sql = get_meta_sql( $meta_query, 'post', $wpdb->posts, 'ID' );
+
+        $sql = $meta_sql[$args['type']];
+
+        if( ! is_null( $args['sql'] ) )
+            $sql = $args['sql'].$sql;
+
+        if( stristr( $sql, $wpdb->posts ) )
+            $sql = str_replace( $wpdb->posts, 'p', $sql );
+
+        if( 'where' == strtolower( $args['type'] ) ){
+            if( preg_match( '/(p.post_date.*AND[[:space:]])/U', $sql, $matches ) ){
+                $sql = str_replace( $matches[1], '', $sql );
+            }
+        }
+
+        return $sql;
+    }
+
+    /**
+     * Returns SQL for sorting `item` CPT get_adjacent_post().
+     *
+     * @global object $wpdb Global WordPress database object.
+     *
+     * @since 1.0.1
+     *
+     * @param array $args {
+     *      Optional. An array of arguments.
+     *
+     *      @type string $sort Either `ASC` or `DESC`.
+     *
+     * }
+     * @return string SQL for sorting `item` CPT get_adjacent_post().
+     */
+    public function item_orderby_sql( $args ){
+        global $wpdb;
+
+        $args = shortcode_atts( array(
+            'sort' => 'ASC'
+        ), $args );
+
+        return 'ORDER BY CAST(' . $wpdb->postmeta . '.meta_value AS SIGNED) ' . strtoupper( $args['sort'] ) . ' LIMIT 1';
+    }
 
     /**
      * Column content for `item` CPT custom columns

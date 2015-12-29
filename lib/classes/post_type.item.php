@@ -46,7 +46,7 @@ class AuctionItem extends AuctionsAndItems{
      * @global object $post Global WordPress post object.
      * @global object $wpdb Global WordPress database object.
      *
-     * @since 1.0.1
+     * @since 1.1.0
      *
      * @param array $args {
      *      Array of arguments.
@@ -106,7 +106,7 @@ class AuctionItem extends AuctionsAndItems{
      *
      * @global object $wpdb Global WordPress database object.
      *
-     * @since 1.0.1
+     * @since 1.1.0
      *
      * @param array $args {
      *      Optional. An array of arguments.

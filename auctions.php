@@ -4,10 +4,10 @@
 	Plugin URI:
 	Description: Adds an `auction` taxonomy with `Item` custom post_types.
 	Author: Michael Wender
-	Version: 1.0.0
+	Version: 1.1.0
 	Author URI: http://michaelwender.com
  */
-/*  Copyright 2014  Michael Wender  (email : michael@michaelwender.com)
+/*  Copyright 2015  Michael Wender  (email : michael@michaelwender.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License, version 2, as
@@ -24,7 +24,7 @@
 */
 
 class AuctionsAndItems {
-    const VER = '1.0.0';
+    const VER = '1.1.0';
     private static $instance = null;
 
     public static function get_instance(){

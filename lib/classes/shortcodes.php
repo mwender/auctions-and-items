@@ -48,7 +48,7 @@ class AuctionShortcodes extends AuctionsAndItems{
 			return false;
 
 		$metadata = wp_get_attachment_metadata( $image[0]->ID );
-		if( ! $metadata )
+		if( ! $metadata || ! isset( $metadata['sizes']['medium'] ) )
 			return false;
 
 		$upload_dir = wp_upload_dir();

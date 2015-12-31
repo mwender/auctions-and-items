@@ -199,7 +199,8 @@ class AuctionShortcodes extends AuctionsAndItems{
 	</tr></thead>
 	<tbody>%1$s</tbody>
 </table>';
-			$table = sprintf( $format_table, implode( "\n", $rows ) );
+			$rows_html = ( is_array( $rows ) )? implode( "\n", $rows ) : '';
+			$table = sprintf( $format_table, $rows_html );
 			$content.= $table;
 
 			set_transient( 'auction_highlights_' . $auction, $content, 48 * HOUR_IN_SECONDS );

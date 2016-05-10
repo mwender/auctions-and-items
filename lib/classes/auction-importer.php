@@ -12,6 +12,9 @@ class AuctionImporter extends AuctionsAndItems{
     }
 
     private function __construct() {
+	add_action( 'admin_menu', array( $this, 'admin_menu' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
+		add_action( 'wp_ajax_auction_importer', array( $this, 'auction_importer_callback' ) );
     }
 
     /**
@@ -34,9 +37,10 @@ class AuctionImporter extends AuctionsAndItems{
 	 * @return void
 	 */
     public function admin_menu(){
-    	global $auctionimporter_hook;
-
     	$auctionimporter_hook = add_submenu_page( 'edit.php?post_type=item', 'Import Auction Items', 'Import Auction', 'edit_posts', 'import-items', array( $this, 'auction_import_page' ) );
+
+	if( $auctionimporter_hook )
+		add_action( 'load-' . $auctionimporter_hook, array( $this, 'contextual_help_tabs' ) );
     }
 
     public function auction_importer_callback(){
@@ -333,18 +337,40 @@ class AuctionImporter extends AuctionsAndItems{
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param string $contextual_help HTML for contextual help.
-	 * @param string $screen_id ID for the current screen.
-	 * @param string $screen
-	 * @return string HTML for display in the WordPress contextual help section.
+	 * @return void
 	 */
-    public function contextual_help( $contextual_help, $screen_id, $screen ){
-    	global $auctionimporter_hook;
+    public function contextual_help_tabs(){
 
-    	if( $auctionimporter_hook == $screen_id )
-    		$contextual_help = file_get_contents( plugin_dir_path( __FILE__ ) . '../html/help.auction-importer.html' );
+	$screen = get_current_screen();
+	$screen->add_help_tab( array(
+		'id' => 'auction-importer-import-help',
+		'title' => 'Import Instructions',
+		'content' => file_get_contents( plugin_dir_path( __FILE__ ) . '../html/help.auction-importer.html' ),
+		) );
 
-    	return $contextual_help;
+	$screen->add_help_tab( array(
+		'id' => 'auction-importer-csv-setup-help',
+		'title' => 'CSV Setup',
+		'content' => file_get_contents( plugin_dir_path( __FILE__ ) . '../html/help.auction-importer.csv-setup.html' ),
+		) );
+
+	$screen->add_help_tab( array(
+		'id' => 'auction-importer-ftp-permissions-help',
+		'title' => 'FTP Permissions',
+		'content' => file_get_contents( plugin_dir_path( __FILE__ ) . '../html/help.auction-importer.ftp-permissions.html' ),
+		) );
+
+	$screen->add_help_tab( array(
+		'id' => 'auction-importer-naming-images-help',
+		'title' => 'Naming Images',
+		'content' => file_get_contents( plugin_dir_path( __FILE__ ) . '../html/help.auction-importer.naming-images.html' ),
+		) );
+
+	$screen->add_help_tab( array(
+		'id' => 'auction-importer-removing-items-help',
+		'title' => 'Removing Items',
+		'content' => file_get_contents( plugin_dir_path( __FILE__ ) . '../html/help.auction-importer.removing-items.html' ),
+		) );
     }
 
 	/**
@@ -591,9 +617,4 @@ class AuctionImporter extends AuctionsAndItems{
 }
 
 $AuctionImporter = AuctionImporter::get_instance();
-
-add_action( 'admin_menu', array( $AuctionImporter, 'admin_menu' ) );
-add_action( 'admin_enqueue_scripts', array( $AuctionImporter, 'admin_enqueue_scripts' ) );
-add_action( 'wp_ajax_auction_importer', array( $AuctionImporter, 'auction_importer_callback' ) );
-add_action( 'contextual_help', array( $AuctionImporter, 'contextual_help' ), 10, 3 );
 ?>

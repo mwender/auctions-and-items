@@ -12,7 +12,7 @@ class AuctionImporter extends AuctionsAndItems{
     }
 
     private function __construct() {
-	add_action( 'admin_menu', array( $this, 'admin_menu' ) );
+    	add_action( 'admin_menu', array( $this, 'admin_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
 		add_action( 'wp_ajax_auction_importer', array( $this, 'auction_importer_callback' ) );
     }
@@ -39,8 +39,8 @@ class AuctionImporter extends AuctionsAndItems{
     public function admin_menu(){
     	$auctionimporter_hook = add_submenu_page( 'edit.php?post_type=item', 'Import Auction Items', 'Import Auction', 'edit_posts', 'import-items', array( $this, 'auction_import_page' ) );
 
-	if( $auctionimporter_hook )
-		add_action( 'load-' . $auctionimporter_hook, array( $this, 'contextual_help_tabs' ) );
+    	if( $auctionimporter_hook )
+    		add_action( 'load-' . $auctionimporter_hook, array( $this, 'contextual_help_tabs' ) );
     }
 
     public function auction_importer_callback(){
@@ -341,35 +341,35 @@ class AuctionImporter extends AuctionsAndItems{
 	 */
     public function contextual_help_tabs(){
 
-	$screen = get_current_screen();
-	$screen->add_help_tab( array(
-		'id' => 'auction-importer-import-help',
-		'title' => 'Import Instructions',
-		'content' => file_get_contents( plugin_dir_path( __FILE__ ) . '../html/help.auction-importer.html' ),
+    	$screen = get_current_screen();
+    	$screen->add_help_tab( array(
+    		'id' => 'auction-importer-import-help',
+    		'title' => 'Import Instructions',
+    		'content' => file_get_contents( plugin_dir_path( __FILE__ ) . '../html/help.auction-importer.html' ),
 		) );
 
-	$screen->add_help_tab( array(
-		'id' => 'auction-importer-csv-setup-help',
-		'title' => 'CSV Setup',
-		'content' => file_get_contents( plugin_dir_path( __FILE__ ) . '../html/help.auction-importer.csv-setup.html' ),
+    	$screen->add_help_tab( array(
+    		'id' => 'auction-importer-csv-setup-help',
+    		'title' => 'CSV Setup',
+    		'content' => file_get_contents( plugin_dir_path( __FILE__ ) . '../html/help.auction-importer.csv-setup.html' ),
 		) );
 
-	$screen->add_help_tab( array(
-		'id' => 'auction-importer-ftp-permissions-help',
-		'title' => 'FTP Permissions',
-		'content' => file_get_contents( plugin_dir_path( __FILE__ ) . '../html/help.auction-importer.ftp-permissions.html' ),
+    	$screen->add_help_tab( array(
+    		'id' => 'auction-importer-ftp-permissions-help',
+    		'title' => 'FTP Permissions',
+    		'content' => file_get_contents( plugin_dir_path( __FILE__ ) . '../html/help.auction-importer.ftp-permissions.html' ),
 		) );
 
-	$screen->add_help_tab( array(
-		'id' => 'auction-importer-naming-images-help',
-		'title' => 'Naming Images',
-		'content' => file_get_contents( plugin_dir_path( __FILE__ ) . '../html/help.auction-importer.naming-images.html' ),
+    	$screen->add_help_tab( array(
+    		'id' => 'auction-importer-naming-images-help',
+    		'title' => 'Naming Images',
+    		'content' => file_get_contents( plugin_dir_path( __FILE__ ) . '../html/help.auction-importer.naming-images.html' ),
 		) );
 
-	$screen->add_help_tab( array(
-		'id' => 'auction-importer-removing-items-help',
-		'title' => 'Removing Items',
-		'content' => file_get_contents( plugin_dir_path( __FILE__ ) . '../html/help.auction-importer.removing-items.html' ),
+    	$screen->add_help_tab( array(
+    		'id' => 'auction-importer-removing-items-help',
+    		'title' => 'Removing Items',
+    		'content' => file_get_contents( plugin_dir_path( __FILE__ ) . '../html/help.auction-importer.removing-items.html' ),
 		) );
     }
 
@@ -490,14 +490,14 @@ class AuctionImporter extends AuctionsAndItems{
 			wp_set_object_terms( $post_ID, array( intval( $auction ) ), 'auction' );
 
 		// assign the item to any specified galleries
-		if ( !empty( $item['Gallery'] ) ) {
-			$galleries = array();
-			$galleries = explode( ',', $item['Gallery'] );
-			$galleries = array_map( 'intval', $galleries );
-			$galleries = array_unique( $galleries );
-			wp_set_object_terms( $post_ID, $galleries, 'gallery' );
+		if ( !empty( $item['Tags'] ) ) {
+			$item_tags = array();
+			$item_tags = explode( ',', $item['Tags'] );
+			$item_tags = array_map( 'intval', $item_tags );
+			$item_tags = array_unique( $item_tags );
+			wp_set_object_terms( $post_ID, $item_tags, 'item_tags' );
 		} else {
-			wp_set_object_terms( $post_ID, null, 'gallery' ); // remove all galleries for an item
+			wp_set_object_terms( $post_ID, null, 'item_tags' ); // remove all galleries for an item
 		}
 		update_post_meta( $post_ID, '_lotnum', $item['LotNum'] );
 		update_post_meta( $post_ID, '_low_est', $item['LowEst'] );

@@ -176,6 +176,11 @@ add_action( 'wp_enqueue_scripts', array( $AuctionsAndItems, 'enqueue_scripts' ),
 
 require_once( 'lib/classes/post_type.item.php' );
 require_once( 'lib/classes/taxonomy.auction.php' );
+
+// Tags for Auction Items
+require_once( 'lib/classes/taxonomy.item-tags.php' );
+$ItemTagTaxonomy = ItemTagTaxonomy::get_instance();
+
 require_once( 'lib/classes/auction-importer.php' );
 require_once( 'lib/classes/shortcodes.php' );
 ?>

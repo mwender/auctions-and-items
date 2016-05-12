@@ -47,8 +47,6 @@ class ItemTagTaxonomy extends AuctionsAndItems{
                 'hierarchical' => false,
                 'query_var' => true
             ) );
-        $wpdb->auctionmeta = $wpdb->prefix.'auctionmeta'; // What am I doing here?
-
     }
 
     /**

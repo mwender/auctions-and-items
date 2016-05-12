@@ -489,16 +489,26 @@ class AuctionImporter extends AuctionsAndItems{
 		if ( $tagitem == true )
 			wp_set_object_terms( $post_ID, array( intval( $auction ) ), 'auction' );
 
-		// assign the item to any specified galleries
-		if ( !empty( $item['Tags'] ) ) {
-			$item_tags = array();
+		// assign the item to any specified tags
+		if ( ! empty( $item['Tags'] ) ) {
+			$terms = array();
 			$item_tags = explode( ',', $item['Tags'] );
-			$item_tags = array_map( 'intval', $item_tags );
-			$item_tags = array_unique( $item_tags );
-			wp_set_object_terms( $post_ID, $item_tags, 'item_tags' );
+
+			foreach ( $item_tags as $tag ) {
+				if( $term = term_exists( $tag, 'item_tags' ) ){
+					$terms[$term['term_id']] = $tag;
+				} else {
+					$term = wp_insert_term( $tag, 'item_tags' );
+					$terms[$term['term_id']] = $tag;
+				}
+			}
+			$term_ids = array_keys( $terms );
+
+			wp_set_object_terms( $post_ID, $term_ids, 'item_tags' );
 		} else {
-			wp_set_object_terms( $post_ID, null, 'item_tags' ); // remove all galleries for an item
+			wp_set_object_terms( $post_ID, null, 'item_tags' ); // remove all item_tags for an item
 		}
+
 		update_post_meta( $post_ID, '_lotnum', $item['LotNum'] );
 		update_post_meta( $post_ID, '_low_est', $item['LowEst'] );
 		update_post_meta( $post_ID, '_high_est', $item['HighEst'] );

@@ -528,6 +528,14 @@ class AuctionImporter extends AuctionsAndItems{
 		if ( !empty( $item['iGavelLotNum'] ) )
 			update_post_meta( $post_ID, '_igavel_lotnum', $item['iGavelLotNum'] );
 
+		/**
+		 * BIDSQUARE LINKS
+		 *
+		 * Example: http://auctions.bidsquare.com/view-auctions/catalog/id/891/lot/12362
+		 */
+		if( ! empty( $item['BidsquareLotNum'] ) )
+			update_post_meta( $post_ID, '_bidsquare_lotnum', $item['BidsquareLotNum'] );
+
 		if ( !empty( $csvID ) && !empty( $offset ) )
 			update_post_meta( $csvID, '_last_import', $offset );
 

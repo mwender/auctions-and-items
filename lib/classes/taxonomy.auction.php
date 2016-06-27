@@ -338,7 +338,7 @@ class AuctionTaxonomy extends AuctionsAndItems{
                     </td>
                 </tr>
                 <tr>
-                    <th scope="row" valign="top"><label for="meta[bidsquare_id]"><?php _e( 'BidSquare Auction ID', 'caseanti' ); ?></label></th>
+                    <th scope="row" valign="top"><label for="meta[bidsquare_id]"><?php _e( 'Bidsquare Auction ID', 'caseanti' ); ?></label></th>
                     <td>
                         <input id="meta[bidsquare_id]" name="meta[bidsquare_id]" type="text" value="<?php if ( isset( $meta['bidsquare_id'] ) ) print( $meta['bidsquare_id'] ); ?>" size="20" />
                         <p class="description"><?php _e( 'Add the BidSquare Auction ID to display <strong>Bid Now</strong> and <strong>Sold Price</strong> links next to each item in this auction.', 'caseanti' ); ?></p>

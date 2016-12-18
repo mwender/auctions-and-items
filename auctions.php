@@ -174,6 +174,23 @@ register_activation_hook( __FILE__, array( $AuctionsAndItems, 'activate' ) );
 add_action( 'wp_enqueue_scripts', array( $AuctionsAndItems, 'register_scripts' ), 9 );
 add_action( 'wp_enqueue_scripts', array( $AuctionsAndItems, 'enqueue_scripts' ), 10 );
 
+/**
+ * Add a custom hook 'aai_empty_trash', this hook runs when
+ * an `Empty Trash` button is clicked.
+ */
+add_action( 'load-edit.php', function()
+{
+    add_action( 'before_delete_post', function ( $post_id )
+    {
+        if (
+            'trash' === get_post_status( $post_id )
+            && filter_input( INPUT_GET, 'delete_all' )
+            && 1 === did_action( 'before_delete_post ' )
+        )
+            do_action( 'aai_empty_trash', $post_id );
+    } );
+} );
+
 require_once( 'lib/classes/post_type.item.php' );
 require_once( 'lib/classes/taxonomy.auction.php' );
 

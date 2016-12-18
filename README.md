@@ -4,6 +4,10 @@ Adds an `Items` custom post_type along with an `Auction` taxonomy. Together, the
 
 ## Changelog
 
+__Version 1.3.0 - 12/18/2016__
+
+- Deleting item image attachments during item delete
+
 __Version 1.2.0 - 06/27/2016__
 
 - Adding `Item Tags` custom taxonomy

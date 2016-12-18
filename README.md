@@ -4,6 +4,11 @@ Adds an `Items` custom post_type along with an `Auction` taxonomy. Together, the
 
 ## Changelog
 
+__Version 1.2.0 - 06/27/2016__
+
+- Adding `Item Tags` custom taxonomy
+- Adding Bidsquare lot numbers to auction import
+
 __Version 1.1.0 - 12/29/2015__
 
 - Adding Next/Previous navigation to items.

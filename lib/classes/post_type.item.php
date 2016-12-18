@@ -32,11 +32,41 @@ class AuctionItem extends AuctionsAndItems{
         add_filter( 'get_previous_post_sort', function(){
             return $this->item_orderby_sql( array( 'sort' => 'DESC' ) );
         }, 999 );
+
+        add_action( 'before_delete_post', [$this, 'delete_item_images'] );
+        add_action( 'aai_empty_trash', [$this, 'delete_item_images'], 10, 1 );
     }
 
     /**
     * END CLASS SETUP
     */
+
+    /**
+     * Deletes images attached to an auction item
+     *
+     * @see get_attached_media, wp_delete_attachment
+     * @global object $post WordPress post object.
+     *
+     * @since 1.3.0
+     *
+     * @return void
+     */
+    static public function delete_item_images( $post_id = null ){
+        if( is_null( $post_id ) ){
+            global $post;
+            $post_id = $post->ID;
+        }
+
+        if( ! 'item' == get_post_type( $post_id ) )
+            return;
+
+        $images = get_attached_media( 'image', $post_id );
+        if( is_array( $images ) && 0 < count( $images ) ){
+            foreach( $images as $image ){
+                wp_delete_attachment( $image->ID, true );
+            }
+        }
+    }
 
     /**
      * Builds SQL for filtering get_adjacent_post for `item` CPT.

@@ -164,14 +164,15 @@ class AuctionItem extends AuctionsAndItems{
      * @param string $column Column name.
      * @return void
      */
-    public function column_content_for_items( $column ){
-        global $post;
+    public function column_content_for_items( $column, $post_id ){
+
         switch ( $column ) {
             case 'ID':
-                echo $post->ID;
+                echo $post_id;
                 break;
+
             case 'auction':
-                $auctions = get_the_terms( $post->ID, 'auction' );
+                $auctions = get_the_terms( $post_id, 'auction' );
                 if ( !empty( $auctions ) ) {
                     $out = array();
                     foreach ( $auctions as $c )
@@ -180,6 +181,24 @@ class AuctionItem extends AuctionsAndItems{
                     echo join( ', ', $out );
                 } else {
                     _e( 'No auction' );
+                }
+                break;
+
+            case 'item_categories':
+                if( $item_categories = wp_get_object_terms( $post_id, 'item_category' ) ){
+                    foreach ($item_categories as $category_object ) {
+                        $categories[] = $category_object->name;
+                    }
+                    echo implode(', ', $categories );
+                }
+                break;
+
+            case 'item_tags':
+                if( $item_tags = wp_get_object_terms( $post_id, 'item_tags' ) ){
+                    foreach ($item_tags as $category_object ) {
+                        $tags[] = $category_object->name;
+                    }
+                    echo implode(', ', $tags );
                 }
                 break;
         }
@@ -198,6 +217,8 @@ class AuctionItem extends AuctionsAndItems{
             'cb' => '<input type="checkbox" />',
             'title' => 'Item',
             'auction' => 'Auctions',
+            'item_categories' => 'Categories',
+            'item_tags' => 'Tags',
             'date' => 'Date',
         );
         return $defaults;

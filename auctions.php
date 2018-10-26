@@ -194,6 +194,10 @@ add_action( 'load-edit.php', function()
 require_once( 'lib/classes/post_type.item.php' );
 require_once( 'lib/classes/taxonomy.auction.php' );
 
+// Categories for Auction Items
+require_once( 'lib/classes/taxonomy.item-category.php' );
+$ItemCategoryTaxonomy = ItemCategoryTaxonomy::get_instance();
+
 // Tags for Auction Items
 require_once( 'lib/classes/taxonomy.item-tags.php' );
 $ItemTagTaxonomy = ItemTagTaxonomy::get_instance();

@@ -56,172 +56,172 @@ class AuctionImporter extends AuctionsAndItems{
     	switch( $cb_action ){
 
     		case 'delete_csv':
-				wp_delete_attachment( $id );
-				delete_transient( 'csv_' . $id ); // deletes transient set in $this->open_csv()
-				$data['deleted'] = true;
+					wp_delete_attachment( $id );
+					delete_transient( 'csv_' . $id ); // deletes transient set in $this->open_csv()
+					$data['deleted'] = true;
 
-				$response->data = $data;
-    		break;
+					$response->data = $data;
+	    		break;
 
-    		case 'get_csv_list':
-				$args = array(
-					'post_type' => 'attachment',
-					'numberposts' => -1,
-					'post_mime_type' => 'text/csv',
-					'orderby' => 'date',
-					'order' => 'DESC'
+	    	case 'get_csv_list':
+					$args = array(
+						'post_type' => 'attachment',
+						'numberposts' => -1,
+						'post_mime_type' => 'text/csv',
+						'orderby' => 'date',
+						'order' => 'DESC'
 
-				);
-				$files = get_posts( $args );
-				$x = 0;
-				foreach ( $files as $file ) {
-					setup_postdata( $file );
-					$data['csv'][$x]['id'] = $file->ID;
-					$data['csv'][$x]['post_title'] = $file->post_title;
-					$data['csv'][$x]['timestamp'] = date( 'm/d/y g:i:sa', strtotime( $file->post_date ) );
-					$data['csv'][$x]['filename'] = basename( $file->guid );
-					$data['csv'][$x]['image_folder'] = get_post_meta( $file->ID, '_image_folder', true );
-					$data['csv'][$x]['last_import'] = get_post_meta( $file->ID, '_last_import', true );
-					if ( empty( $data['csv'][$x]['last_import'] ) )
-						$data['csv'][$x]['last_import'] = 0;
-					$args = array( 'taxonomy'=>'auction', 'name'=>'auction-'.$file->ID, 'id'=>'auction-'.$file->ID, 'echo'=>false, 'hierarchical'=>true, 'orderby'=>'name', 'hide_empty'=>false, 'selected'=>get_post_meta( $file->ID, '_auction', true ), 'show_option_none'=>'Select an auction...' );
-					$auction_cats = wp_dropdown_categories( $args );
-					$auction_cats = preg_replace( "#<select([^>]*)>#", "<select$1 onchange=\"updateCSVAuction($file->ID, this.options[this.selectedIndex].value);\">", $auction_cats );
-					$data['csv'][$x]['auction'] = $auction_cats;
-					$x++;
-				}
-				$data['imgfolders'] = $this->get_img_dirs();
-
-				$response->data = $data;
-    		break;
-
-    		case 'import_csv':
-				$limit = 1; // limit the number of rows to import
-				$offset = $_POST['csvoffset'];
-
-				$response->id = $id;
-				$response->title = get_the_title( $id );
-
-				// Get the URL and filename of the CSV
-				$url = wp_get_attachment_url( $id );
-				$response->url = $url;
-				$response->filename = basename( $url );
-
-				// Get the auction assigned to this CSV
-				$auction = get_post_meta( $id, '_auction', true );
-				$term = get_term( $auction, 'auction' );
-				$auction_slug = $term->slug;
-
-				// Get the folder where this auction's images are stored
-				$imgpath = get_post_meta( $id, '_image_folder', true );
-
-				// Open this CSV
-				$csvfile = str_replace( get_bloginfo( 'url' ) . '/', ABSPATH, $url );
-				$csv = $this->open_csv( $csvfile, $id );
-				$response->total_rows = count( $csv['rows'] );
-				$csv['rows'] = array_slice( $csv['rows'], $offset, $limit );
-				$response->selected_rows = count( $csv['rows'] );
-				$response->csv = $csv;
-				foreach ( $response->csv['rows'] as $row ) {
+					);
+					$files = get_posts( $args );
 					$x = 0;
-					$item = array();
-					foreach ( $row as $key => $value ) {
-						$assoc_key = $csv['columns'][$x];
-						$item[$assoc_key] = $value;
+					foreach ( $files as $file ) {
+						setup_postdata( $file );
+						$data['csv'][$x]['id'] = $file->ID;
+						$data['csv'][$x]['post_title'] = $file->post_title;
+						$data['csv'][$x]['timestamp'] = date( 'm/d/y g:i:sa', strtotime( $file->post_date ) );
+						$data['csv'][$x]['filename'] = basename( $file->guid );
+						$data['csv'][$x]['image_folder'] = get_post_meta( $file->ID, '_image_folder', true );
+						$data['csv'][$x]['last_import'] = get_post_meta( $file->ID, '_last_import', true );
+						if ( empty( $data['csv'][$x]['last_import'] ) )
+							$data['csv'][$x]['last_import'] = 0;
+						$args = array( 'taxonomy'=>'auction', 'name'=>'auction-'.$file->ID, 'id'=>'auction-'.$file->ID, 'echo'=>false, 'hierarchical'=>true, 'orderby'=>'name', 'hide_empty'=>false, 'selected'=>get_post_meta( $file->ID, '_auction', true ), 'show_option_none'=>'Select an auction...' );
+						$auction_cats = wp_dropdown_categories( $args );
+						$auction_cats = preg_replace( "#<select([^>]*)>#", "<select$1 onchange=\"updateCSVAuction($file->ID, this.options[this.selectedIndex].value);\">", $auction_cats );
+						$data['csv'][$x]['auction'] = $auction_cats;
 						$x++;
 					}
-					$last_import = $offset + $limit;
+					$data['imgfolders'] = $this->get_img_dirs();
 
-					$args = array(
-						'item' => $item,
-						'auction' => $auction,
-						'auction_slug' => $auction_slug,
-						'csvID' => $id,
-						'offset' => $last_import,
-					);
-					$post_ID = $this->import_item( $args );
-					$upload_dir = wp_upload_dir();
-					$imgdir = $upload_dir['basedir'] . '/auctions/' . $imgpath . '/';
-					$response->images = $this->get_img_from_dir( $post_ID, $item['LotNum'], $imgdir );
-					$response->post_ID = $post_ID;
-					$response->imgdir = $imgdir;
-				}
-				$response->current_offset = ( 1 == $limit )? 'Importing row ' . ( $offset + 1 ) : 'Importing rows '.( $offset + 1 ).' - '.( $offset + $limit );
-				$response->offset = $offset + $limit;
-    		break;
+					$response->data = $data;
+	    		break;
+
+    		case 'import_csv':
+					$limit = 1; // limit the number of rows to import
+					$offset = $_POST['csvoffset'];
+
+					$response->id = $id;
+					$response->title = get_the_title( $id );
+
+					// Get the URL and filename of the CSV
+					$url = wp_get_attachment_url( $id );
+					$response->url = $url;
+					$response->filename = basename( $url );
+
+					// Get the auction assigned to this CSV
+					$auction = get_post_meta( $id, '_auction', true );
+					$term = get_term( $auction, 'auction' );
+					$auction_slug = $term->slug;
+
+					// Get the folder where this auction's images are stored
+					$imgpath = get_post_meta( $id, '_image_folder', true );
+
+					// Open this CSV
+					$csvfile = str_replace( get_bloginfo( 'url' ) . '/', ABSPATH, $url );
+					$csv = $this->open_csv( $csvfile, $id );
+					$response->total_rows = count( $csv['rows'] );
+					$csv['rows'] = array_slice( $csv['rows'], $offset, $limit );
+					$response->selected_rows = count( $csv['rows'] );
+					$response->csv = $csv;
+					foreach ( $response->csv['rows'] as $row ) {
+						$x = 0;
+						$item = array();
+						foreach ( $row as $key => $value ) {
+							$assoc_key = $csv['columns'][$x];
+							$item[$assoc_key] = $value;
+							$x++;
+						}
+						$last_import = $offset + $limit;
+
+						$args = array(
+							'item' => $item,
+							'auction' => $auction,
+							'auction_slug' => $auction_slug,
+							'csvID' => $id,
+							'offset' => $last_import,
+						);
+						$post_ID = $this->import_item( $args );
+						$upload_dir = wp_upload_dir();
+						$imgdir = $upload_dir['basedir'] . '/auctions/' . $imgpath . '/';
+						$response->images = $this->get_img_from_dir( $post_ID, $item['LotNum'], $imgdir );
+						$response->post_ID = $post_ID;
+						$response->imgdir = $imgdir;
+					}
+					$response->current_offset = ( 1 == $limit )? 'Importing row ' . ( $offset + 1 ) : 'Importing rows '.( $offset + 1 ).' - '.( $offset + $limit );
+					$response->offset = $offset + $limit;
+	    		break;
 
     		case 'import_image':
-				$post_ID = $_POST['itemID'];
-				$imgdir = $_POST['imgdir'];
-				$image = $_POST['image'];
-				$import_status = $this->import_single_attachment( $post_ID, $imgdir, $image );
-				$response->message = ( true == $import_status )? 'SUCCESS: Imported ' . $image . ', attached to ' . get_the_title( $post_ID ). ' (' . $post_ID . ').' : 'FAIL: Unable to import ' . $image;
-				$response->status = $import_status;
-				$response->image = $image;
-    		break;
+					$post_ID = $_POST['itemID'];
+					$imgdir = $_POST['imgdir'];
+					$image = $_POST['image'];
+					$import_status = $this->import_single_attachment( $post_ID, $imgdir, $image );
+					$response->message = ( true == $import_status )? 'SUCCESS: Imported ' . $image . ', attached to ' . get_the_title( $post_ID ). ' (' . $post_ID . ').' : 'FAIL: Unable to import ' . $image;
+					$response->status = $import_status;
+					$response->image = $image;
+	    		break;
 
     		case 'load_csv':
-				$url = wp_get_attachment_url( $id );
-				$data['id'] = $id;
-				$data['url'] = $url;
-				$data['title'] = get_the_title( $id );
-				$data['filename'] = basename( $url );
-				$csvfile = str_replace( get_bloginfo( 'url' ). '/', ABSPATH, $url );
-				$data['filepath'] = $csvfile;
-				$data['csv'] = $this->open_csv( $csvfile, $id );
-				$data['imgpath'] = get_post_meta( $id, '_image_folder', true );
-				if ( $auction_id = get_post_meta( $id, '_auction', true ) ) {
-					if ( $term = get_term( $auction_id, 'auction' ) ) {
-						$auction = $term->name;
+					$url = wp_get_attachment_url( $id );
+					$data['id'] = $id;
+					$data['url'] = $url;
+					$data['title'] = get_the_title( $id );
+					$data['filename'] = basename( $url );
+					$csvfile = str_replace( get_bloginfo( 'url' ). '/', ABSPATH, $url );
+					$data['filepath'] = $csvfile;
+					$data['csv'] = $this->open_csv( $csvfile, $id );
+					$data['imgpath'] = get_post_meta( $id, '_image_folder', true );
+					if ( $auction_id = get_post_meta( $id, '_auction', true ) ) {
+						if ( $term = get_term( $auction_id, 'auction' ) ) {
+							$auction = $term->name;
+						} else {
+							$auction = '<em>Does not exist (term_id = '.$auction_id.').</em>';
+						}
 					} else {
-						$auction = '<em>Does not exist (term_id = '.$auction_id.').</em>';
+						$auction = '<em>Not set.</em>';
 					}
-				} else {
-					$auction = '<em>Not set.</em>';
-				}
-				$data['auction'] = $auction;
-				$data['offset'] = 0;
+					$data['auction'] = $auction;
+					$data['offset'] = 0;
 
-				$response->csv = $data;
-    		break;
+					$response->csv = $data;
+	    		break;
 
     		case 'updateauction':
-				// verify if this is an auto save routine. If it is our form has not been submitted, so we don't want to do anything
-				if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) die();
-				$auction = $_POST['auction'];
-				if ( is_numeric( $id ) ) {
-					if ( get_post_meta( $id, '_auction' ) == '' )
-						add_post_meta( $id, '_auction', $auction );
-					elseif ( $auction != get_post_meta( $id, '_auction', true ) )
-						update_post_meta( $id, '_auction', $auction );
-					elseif ( $auction == '' )
-						delete_post_meta( $id, '_auction', get_post_meta( $id, '_auction', true ) );
-					$data['status'] = 'Saved.';
-				} else {
-					$data['status'] = 'Not saved! Try again.';
-				}
+					// verify if this is an auto save routine. If it is our form has not been submitted, so we don't want to do anything
+					if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) die();
+					$auction = $_POST['auction'];
+					if ( is_numeric( $id ) ) {
+						if ( get_post_meta( $id, '_auction' ) == '' )
+							add_post_meta( $id, '_auction', $auction );
+						elseif ( $auction != get_post_meta( $id, '_auction', true ) )
+							update_post_meta( $id, '_auction', $auction );
+						elseif ( $auction == '' )
+							delete_post_meta( $id, '_auction', get_post_meta( $id, '_auction', true ) );
+						$data['status'] = 'Saved.';
+					} else {
+						$data['status'] = 'Not saved! Try again.';
+					}
 
-				$response->data = $data;
-    		break;
+					$response->data = $data;
+	    		break;
 
     		case 'updateimgpath':
-				// verify if this is an auto save routine. Then the form has not been submitted, so we don't want to do anything
-				if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) die();
-				$imgpath = $_POST['imgpath'];
-				if ( is_numeric( $id ) ) {
-					if ( get_post_meta( $id, '_image_folder' ) == '' )
-						add_post_meta( $id, '_image_folder', $imgpath );
-					elseif ( $imgpath != get_post_meta( $id, '_image_folder', true ) )
-						update_post_meta( $id, '_image_folder', $imgpath );
-					elseif ( $imgpath == '' )
-						delete_post_meta( $id, '_image_folder', get_post_meta( $id, '_image_folder', true ) );
-					$data['status'] = 'Saved.';
-				} else {
-					$data['status'] = 'Not saved! Try again.';
-				}
+					// verify if this is an auto save routine. Then the form has not been submitted, so we don't want to do anything
+					if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) die();
+					$imgpath = $_POST['imgpath'];
+					if ( is_numeric( $id ) ) {
+						if ( get_post_meta( $id, '_image_folder' ) == '' )
+							add_post_meta( $id, '_image_folder', $imgpath );
+						elseif ( $imgpath != get_post_meta( $id, '_image_folder', true ) )
+							update_post_meta( $id, '_image_folder', $imgpath );
+						elseif ( $imgpath == '' )
+							delete_post_meta( $id, '_image_folder', get_post_meta( $id, '_image_folder', true ) );
+						$data['status'] = 'Saved.';
+					} else {
+						$data['status'] = 'Not saved! Try again.';
+					}
 
-				$response->data = $data;
-    		break;
+					$response->data = $data;
+	    		break;
     	}
 
     	wp_send_json( $response );
@@ -507,6 +507,26 @@ class AuctionImporter extends AuctionsAndItems{
 			wp_set_object_terms( $post_ID, $term_ids, 'item_tags' );
 		} else {
 			wp_set_object_terms( $post_ID, null, 'item_tags' ); // remove all item_tags for an item
+		}
+
+		// assign the item to any specified categories
+		if ( ! empty( $item['Categories'] ) ) {
+			$terms = array();
+			$item_categories = explode( ',', $item['Categories'] );
+
+			foreach ( $item_categories as $category ) {
+				if( $term = term_exists( $category, 'item_category' ) ){
+					$terms[$term['term_id']] = $category;
+				} else {
+					$term = wp_insert_term( $category, 'item_category' );
+					$terms[$term['term_id']] = $category;
+				}
+			}
+			$term_ids = array_keys( $terms );
+
+			wp_set_object_terms( $post_ID, $term_ids, 'item_category' );
+		} else {
+			wp_set_object_terms( $post_ID, null, 'item_category' ); // remove all categories for an item
 		}
 
 		update_post_meta( $post_ID, '_lotnum', $item['LotNum'] );

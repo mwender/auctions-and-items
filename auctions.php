@@ -61,16 +61,31 @@ class AuctionsAndItems {
         wp_enqueue_script( 'flare-lightbox', plugin_dir_url( __FILE__ ) . 'lib/js/flare/jquery.pixelentity.flare.min.js', array( 'jquery' ) );
         wp_enqueue_script( 'flare-init', plugin_dir_url( __FILE__ ) . 'lib/js/flare/flare-init.js', array( 'flare-lightbox' ) );
 
-        if( is_tax( 'auction' ) ){
+        if( is_tax( 'auction' ) || is_tax( 'item_tags' ) || is_tax( 'item_category' ) ){
             wp_enqueue_script( 'datatables-user' );
 
+            $localize_args = [];
+            $localize_args['ajax_url'] = admin_url( 'admin-ajax.php' );
+
             global $wp_query;
-            $value    = get_query_var($wp_query->query_vars['taxonomy']);
-            $current_term = get_term_by('slug',$value,$wp_query->query_vars['taxonomy']);
+            $query_taxonomy = get_query_var( 'taxonomy' );
+            $query_term_slug = get_query_var( 'term' );
+            $current_term = get_term_by( 'slug', $query_term_slug, $query_taxonomy );
+            //error_log('$query_taxonomy = '.$query_taxonomy.'; $query_term_slug = '.$query_term_slug.'; $current_term = ' . print_r( $current_term, true ) );
 
-            $show_realized = get_metadata( 'auction', $current_term->term_id, 'show_realized', true );
+            if( is_tax( 'auction' ) ){
 
-            wp_localize_script( 'datatables-user', 'wpvars', array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'auction' => $current_term->term_id, 'show_realized' => $show_realized ) );
+              $localize_args['show_realized'] = get_metadata( 'auction', $current_term->term_id, 'show_realized', true );
+              $localize_args['auction'] = $current_term->term_id;
+            } else {
+              $localize_args['show_realized'] = false;
+              // Send term_id and term taxonomy
+              $localize_args['term_id'] = $current_term->term_id;
+              $localize_args['term_taxonomy'] = $query_taxonomy;
+              //error_log('$wp_query->query_vars = ' . print_r($wp_query->query_vars,true) );
+            }
+
+            wp_localize_script( 'datatables-user', 'wpvars', $localize_args );
             wp_enqueue_style( 'datatables' );
             wp_enqueue_style( 'dashicons' );
         }
@@ -196,11 +211,9 @@ require_once( 'lib/classes/taxonomy.auction.php' );
 
 // Categories for Auction Items
 require_once( 'lib/classes/taxonomy.item-category.php' );
-$ItemCategoryTaxonomy = ItemCategoryTaxonomy::get_instance();
 
 // Tags for Auction Items
 require_once( 'lib/classes/taxonomy.item-tags.php' );
-$ItemTagTaxonomy = ItemTagTaxonomy::get_instance();
 
 require_once( 'lib/classes/auction-importer.php' );
 require_once( 'lib/classes/shortcodes.php' );

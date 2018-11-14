@@ -80,22 +80,16 @@ class ItemTagTaxonomy extends AuctionsAndItems{
         $response->draw = $_POST['draw']; // $draw == 1 for the first request when the page is requested
         $response->show_realized = $_POST['show_realized'];
 
-        // Which auction are we viewing?
-        if( ! isset( $_POST['auction'] ) || empty( $_POST['auction'] ) ){
-            $response->data = array( 'lotnum' => 'n/a', 'image' => 'n/a', 'title' => 'No auction ID!', 'desc' => 'n/a', 'price' => '$0.00' );
-            $response->draw = 1;
-            $response->recordsTotal = 1;
-            $response->recordsFiltered = 1;
-            $response->error = 'No auction ID received!';
-            return $response;
-        }
-        $response->auction_id = (int) $_POST['auction'];
-        $args['tax_query'] = array(
-            array(
-                'taxonomy' => 'auction',
-                'terms' => $response->auction_id,
-            ),
-        );
+        $response->term_id = (int) $_POST['term_id'];
+        $response->term_taxonomy = $_POST['term_taxonomy'];
+
+        $args['tax_query'] = [
+          [
+            'taxonomy' => $response->term_taxonomy,
+            'terms' => $response->term_id,
+            'field' => 'term_id',
+          ],
+        ];
 
         // Paging and offset
         $response->offset = ( isset( $_POST['start'] ) )? $_POST['start'] : 0;
@@ -183,5 +177,36 @@ class ItemTagTaxonomy extends AuctionsAndItems{
         wp_send_json( $response );
     }
 
+    /**
+     * Modify the query for `item_tags` taxonomy
+     *
+     * @since 1.0.0
+     *
+     * @param object $query WordPress query object.
+     * @return void
+     */
+     public function pre_get_posts( $query ){
+        if( ! $query->is_main_query() )
+            return;
+
+        if( ! is_admin() && is_tax( 'item_tags' ) ){
+            $query->set( 'posts_per_page', 20 );
+            $query->set( 'orderby', 'meta_value' );
+            $query->set( 'meta_key', '_lotnum' );
+            $query->set( 'meta_type', 'NUMERIC' );
+            $query->set( 'order', 'ASC' );
+            return;
+        }
+     }
+
 }
+
+$ItemTagTaxonomy = ItemTagTaxonomy::get_instance();
+
+// Modifying query for taxonomy-item_tags.php
+add_action( 'pre_get_posts', array( $ItemTagTaxonomy, 'pre_get_posts' ) );
+
+// AJAX calls for Auction DataTables display
+add_action( 'wp_ajax_query_items', array( $ItemTagTaxonomy, 'query_items_callback' ) );
+add_action( 'wp_ajax_nopriv_query_items', array( $ItemTagTaxonomy, 'query_items_callback' ) );
 ?>

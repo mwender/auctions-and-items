@@ -84,44 +84,78 @@ class AuctionShortcodes extends AuctionsAndItems{
 		wp_enqueue_script( 'footable-striping' );
 		wp_enqueue_script( 'footable-user' );
 
-		extract( shortcode_atts( array(
-			'auction' => 0,
-		), $atts ) );
+		$args = shortcode_atts( array(
+			'auction' 		=> null,
+			'categories'	=> null,
+			'tags' 				=> null,
+			'limit'				=> -1,
+		), $atts );
 
 		$flushcache = ( isset( $_GET['flushcache'] ) )? settype( $_GET['flushcache'], 'boolean' ) : false ;
 
-		if( 0 == $auction || is_null( $auction ) )
-			return;
+		$transient_id = sanitize_title_with_dashes( implode( '', $args), '', 'save' );
 
-		if ( false === ( $content = get_transient( 'auction_highlights_' . $auction ) ) || true == $flushcache ) {
+		// When querying w/o an auction_id and no limit set, set the limit to 50.
+		$limit = ( empty( $args['auction'] ) && -1 === $args['limit'] )? 50 : $args['limit'] ;
+
+		$query_args = [
+			'post_type' => 'item',
+			'meta_query' => [
+				[
+					'key' => '_highlight',
+					'value' => true,
+					'compare' => '=',
+				],
+			],
+			'posts_per_page' => $limit,
+			'orderby' => 'meta_value_num',
+			'meta_key' => '_lotnum',
+			'order' => 'ASC',
+		];
+
+		if( ! is_null( $args['auction'] ) && is_numeric( $args['auction'] ) ){
+			$term = get_term( $args['auction'], 'auction' );
+			if( $term ){
+				$query_args['tax_query'][] = [
+					'taxonomy' => 'auction',
+					'field' => 'term_id',
+					'terms' => $args['auction'],
+				];
+			}
+		}
+
+		if( ! is_null( $args['categories'] ) && ! empty( $args['categories'] ) ){
+			$categories = [];
+			$categories = ( stristr( $args['categories'], ',' ) )? array_map( 'trim', explode( ',', $args['categories'] ) ) : [ $args['categories'] ] ;
+			$query_args['tax_query'][] = [
+				'taxonomy' => 'item_category',
+				'field' => 'name',
+				'terms' => $categories,
+				'operator' => 'AND',
+			];
+		}
+
+		if( ! is_null( $args['tags'] ) && ! empty( $args['tags'] ) ){
+			$tags = [];
+			$tags = ( stristr( $args['tags'], ',' ) )? array_map( 'trim', explode( ',', $args['tags'] ) ) : [ $args['tags'] ] ;
+			$query_args['tax_query'][] = [
+				'taxonomy' => 'item_tags',
+				'field' => 'name',
+				'terms' => $tags,
+				'operator' => 'AND',
+			];
+		}
+
+		error_log( str_repeat('-', 40 ) . "\n" . '$query_args = ' . print_r( $query_args, true ) );
+
+		if ( false === ( $content = get_transient( 'auction_highlights_' . $transient_id ) ) || true == $flushcache ) {
 			$content = array();
 			$email = ( function_exists( 'cryptx' ) )? cryptx( 'info@caseantiques.com', '', '', 0 ) : '<a href="mailto:info@caseantiques.com">info@caseantiques.com</a>' ;
 
 			$content[] = '<div class="alert alert-info highlight-alert"><p style="text-align: center">If you are interested in consigning items of this quality for future auctions, please contact us at ' . $email . '.<br />(<em>Note: Prices realized include a buyer\'s premium.</em>)</p></div>';
 
-			$term = get_term( $auction, 'auction' );
-			$args = array(
-				'post_type' => 'item',
-				'tax_query' => array(
-					array(
-						'taxonomy' => 'auction',
-						'field' => 'slug',
-						'terms' => $term->slug,
-					)
-				),
-				'meta_query' => array(
-					array(
-						'key' => '_highlight',
-						'value' => true,
-						'compare' => '=',
-					),
-				),
-				'posts_per_page' => -1,
-				'orderby' => 'meta_value_num',
-				'meta_key' => '_lotnum',
-				'order' => 'ASC',
-			);
-			$posts = get_posts( $args );
+			$posts = get_posts( $query_args );
+			$rows = ['<tr><td colspan="5">No items returned.</td></tr>'];
 			if( $posts ){
 				global $post;
 
@@ -203,7 +237,7 @@ class AuctionShortcodes extends AuctionsAndItems{
 			$table = sprintf( $format_table, $rows_html );
 			$content.= $table;
 
-			set_transient( 'auction_highlights_' . $auction, $content, 48 * HOUR_IN_SECONDS );
+			set_transient( 'auction_highlights_' . $transient_id, $content, 48 * HOUR_IN_SECONDS );
 		} else if( is_user_logged_in() && current_user_can( 'activate_plugins' ) ) {
 			global $post;
 			$content = '<div class="alert alert-warning" style="text-align: center;"><h4><strong>NOTICE:</strong> The highlights shown below have been pulled from cache. If the list appears incomplete, <a href=" ' . get_permalink( $post->ID ) . '?flushcache=true">CLICK HERE</a> to refresh the cache.</h4><p><em>This notice only shows to logged in Case Antiques administrators.</em></p></div>' . $content;

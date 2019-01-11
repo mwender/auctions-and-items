@@ -582,16 +582,18 @@ class AuctionImporter extends AuctionsAndItems{
 		if ( file_exists( $imgdir.$image ) ) {
 			$wp_filetype = wp_check_filetype( $image, null );
 			preg_match( '/^([0-9]+[a-zA-Z]*)_([0-9]+)\.([a-zA-Z]+)/' , $image, $matches );
-			$attachment = array(
+			$attachment = [
 				'post_mime_type' => $wp_filetype['type'],
 				'post_title' => $image,
 				'post_content' => '',
 				'post_status' => 'inherit',
-				'menu_order' => intval( $matches[2] )
-			);
+			];
 			if ( $attachment_id = $this->auction_object_exists( array( 'exists' => 'attachment', 'post_parent' => $post_ID, 'post_title' => $image ) ) ) {
 				$attachment['ID'] = $attachment_id;
 				$update = true;
+			} else {
+				// image doesn't exist, menu order from image file name
+				$attachment['menu_order'] = intval( $matches[2] );
 			}
 
 			// Remove unused image sizes from Centric Pro theme

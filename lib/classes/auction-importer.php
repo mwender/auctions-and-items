@@ -395,10 +395,21 @@ class AuctionImporter extends AuctionsAndItems{
 								$attachment_id = $this->auction_object_exists( array( 'exists' => 'attachment', 'post_parent' => $post_ID, 'post_title' => $entry ) );
 								if ( false == $attachment_id ) { // attachment doesn't exist, add to array for import
 									$data[] = $entry;
-								} else { // attachment exists, don't add to array and update database record for that attachment
+								}
+								/**
+								 * Commenting out the following prevents the `menu_order` value from being
+								 * updated whenever we are reimporting the auction. This scenario comes into
+								 * play whenever we add Auction Highlights for an existing auction. In cases
+								 * like these, users may have updated the order of Item images by hand.
+								 * Commenting out the following prevents the re-import from over writing the
+								 * manually assigned image order.
+								 */
+								/*
+								else { // attachment exists, don't add to array and update database record for that attachment
 									preg_match( $pattern , $entry, $matches );
 									$wpdb->update( $wpdb->posts, array( 'menu_order' => $matches[2] ), array( 'ID' => $attachment_id ), array( '%d' ), array( '%d' ) );
 								}
+								/**/
 							}
 						} // if($matches)
 					}

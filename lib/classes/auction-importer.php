@@ -51,7 +51,7 @@ class AuctionImporter extends AuctionsAndItems{
     	$response = new stdClass();
 
     	$cb_action = $_POST['cb_action'];
-    	$id = $_POST['csvID'];
+    	$id = ( isset( $_POST['csvID'] ) )? $_POST['csvID'] : null ;
 
     	switch( $cb_action ){
 
@@ -377,6 +377,8 @@ class AuctionImporter extends AuctionsAndItems{
 	 * Returns a list of images prefixed with the given lotnum that are not already WP attachments
 	 */
 	function get_img_from_dir( $post_ID, $lotnum, $imgdir ) {
+		$data = [];
+
 		if ( $dh = @dir( $imgdir ) ) {
 			global $wpdb;
 			while ( false !== ( $entry = $dh->read() ) ) {
@@ -540,11 +542,12 @@ class AuctionImporter extends AuctionsAndItems{
 			wp_set_object_terms( $post_ID, null, 'item_category' ); // remove all categories for an item
 		}
 
-		update_post_meta( $post_ID, '_lotnum', $item['LotNum'] );
-		update_post_meta( $post_ID, '_low_est', $item['LowEst'] );
-		update_post_meta( $post_ID, '_high_est', $item['HighEst'] );
-		update_post_meta( $post_ID, '_start_price', $item['StartPrice'] );
-		update_post_meta( $post_ID, '_realized', $item['Realized'] );
+		$meta_fields = [ '_lotnum' => 'LotNum', '_low_est' => 'LowEst', '_high_est' => 'HighEst', '_start_price' => 'StartPrice', '_realized' => 'Realized' ];
+		foreach ( $meta_fields as $meta_key => $item_key ) {
+			$value = ( isset( $item[$item_key] ) )? $item[$item_key] : null ;
+			update_post_meta( $post_ID, $meta_key, $value );
+		}
+
 		$highlight = ( $item['Highlight'] == 'TRUE' || $item['Highlight'] == 'true' )? 1 : 0;
 		update_post_meta( $post_ID, '_highlight', $highlight );
 

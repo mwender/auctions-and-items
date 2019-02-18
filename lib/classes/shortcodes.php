@@ -146,7 +146,7 @@ class AuctionShortcodes extends AuctionsAndItems{
 			];
 		}
 
-		error_log( str_repeat('-', 40 ) . "\n" . '$query_args = ' . print_r( $query_args, true ) );
+		//error_log( str_repeat('-', 40 ) . "\n" . '$query_args = ' . print_r( $query_args, true ) );
 
 		if ( false === ( $content = get_transient( 'auction_highlights_' . $transient_id ) ) || true == $flushcache ) {
 			$content = array();
@@ -194,6 +194,7 @@ class AuctionShortcodes extends AuctionsAndItems{
 						<td>'.$realized_price.'</td>
 					</tr>';
 				}
+				wp_reset_postdata();
 			} else {
 				$content[] = '<p class="clearfix alert alert-warning" style="text-align: center">No highlighted items found for this auction.</p>';
 			}

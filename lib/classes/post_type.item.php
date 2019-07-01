@@ -292,34 +292,40 @@ class AuctionItem extends AuctionsAndItems{
         $item_redirect = get_post_meta( $post->ID, '_item_redirect', true );
     ?>
         <input type="hidden" id="item_options" name="item_options" value="true" />
-    <table class="form-table">
-        <col width="18%" /><col width="82%" />
-        <tr>
-            <th scope="row"><strong>Lot Number</strong></th>
+    <table class="form-table table-striped">
+        <colgroup><col width="20%" /><col width="60%" /><col width="20%" /></colgroup>
+        <tr style="background-color: #eee;">
+            <th scope="row" style="padding-left: 8px;"><strong>Lot Number</strong></th>
             <td><label for="lotnum"><input id="lotnum" type="text" style="width: 80px; text-align: right" name="lotnum" value="<?php echo $lotnum ?>" /></label></td>
+            <td><code>_lotnum</code></td>
         </tr>
-        <tr>
-            <th scope="row"><strong>Low Estimate</strong></th>
+        <tr class="odd">
+            <th scope="row" style="padding-left: 8px;"><strong>Low Estimate</strong></th>
             <td><label for="low_est"><input id="low_est" type="text" style="width: 100px; text-align: right" name="low_est" value="<?php echo $low_est ?>" /></label></td>
+            <td><code>_low_est</code></td>
         </tr>
-        <tr>
-            <th scope="row"><strong>High Estimate</strong></th>
+        <tr style="background-color: #eee;">
+            <th scope="row" style="padding-left: 8px;"><strong>High Estimate</strong></th>
             <td><label for="high_est"><input id="high_est" type="text" style="width: 100px; text-align: right" name="high_est" value="<?php echo $high_est ?>" /></label></td>
+            <td><code>_high_est</code></td>
         </tr>
         <tr>
-            <th scope="row"><strong>Start Price</strong></th>
+            <th scope="row" style="padding-left: 8px;"><strong>Start Price</strong></th>
             <td><label for="start_price"><input id="start_price" type="text" style="width: 100px; text-align: right" name="start_price" value="<?php echo $start_price ?>" /></label></td>
+            <td><code>_start_price</code></td>
         </tr>
-        <tr>
-            <th scope="row"><strong>Realized Price</strong></th>
+        <tr style="background-color: #eee;">
+            <th scope="row" style="padding-left: 8px;"><strong>Realized Price</strong></th>
             <td><label for="realized"><input id="realized" type="text" style="width: 100px; text-align: right" name="realized" value="<?php echo $realized ?>" /></label></td>
+            <td><code>_realized</code></td>
         </tr>
         <tr>
-            <th scope="row"><strong>Highlight Item</strong></th>
-            <td><label for="highlight"><input type="checkbox" name="highlight" id="highlight" value="1"<?php if ( $highlight == true ) echo ' checked="checked"' ?> />Display this item in this auction's highlights. ($highlight = <?php echo $highlight ?>)</label></td>
+            <th scope="row" style="padding-left: 8px;"><strong>Highlight Item</strong></th>
+            <td><label for="highlight"><input type="checkbox" name="highlight" id="highlight" value="1"<?php if ( $highlight == true ) echo ' checked="checked"' ?> />Display this item in this auction's highlights.</label></td>
+            <td><code>_highlight</code></td>
         </tr>
-        <tr>
-            <th scope="row"><strong>Sub-Auction Redirect</strong></th>
+        <tr style="background-color: #eee;">
+            <th scope="row" style="padding-left: 8px;"><strong>Sub-Auction Redirect</strong></th>
             <td><label for="redirect"><?php
             $args = array();
         $args['id'] = 'item_redirect';
@@ -332,6 +338,7 @@ class AuctionItem extends AuctionsAndItems{
         $args['selected'] = $item_redirect;
         wp_dropdown_categories( $args );
         ?><br />If selected, when this item is accessed, the page will redirect to the selected auction.<p style="margin-left: 0">NOTE: This feature is used with sub-auctions with names like "<em>Select Sampling of Uncataloged Items...</em>". In cases like these, this item would simply serve as a placeholder which redirects to a sub-auction containing more items for display.</p></label></td>
+            <td><code>_item_redirect</code></td>
         </tr>
     </table>
         <?php

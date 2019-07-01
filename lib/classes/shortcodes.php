@@ -89,6 +89,7 @@ class AuctionShortcodes extends AuctionsAndItems{
 			'categories'	=> null,
 			'tags' 				=> null,
 			'limit'				=> -1,
+			'preview'			=> false,
 		), $atts );
 
 		$flushcache = ( isset( $_GET['flushcache'] ) )? settype( $_GET['flushcache'], 'boolean' ) : false ;
@@ -100,18 +101,22 @@ class AuctionShortcodes extends AuctionsAndItems{
 
 		$query_args = [
 			'post_type' => 'item',
-			'meta_query' => [
-				[
-					'key' => '_highlight',
-					'value' => true,
-					'compare' => '=',
-				],
-			],
 			'posts_per_page' => $limit,
 			'orderby' => 'meta_value_num',
-			'meta_key' => '_realized',
-			'order' => 'DESC',
 		];
+
+		if( $args['preview'] ){
+			$query_args['meta_key'] = '_lotnum';
+			$query_args['order'] = 'ASC';
+		} else {
+			$query_args['meta_query'] = [
+				'key' => '_highlight',
+				'value' => true,
+				'compare' => '=',
+			];
+			$query_args['meta_key'] = '_realized';
+			$query_args['order'] = 'DESC';
+		}
 
 		// Filter by auction
 		$filterByAuction = false; // Used for displaying `Lot No.` column
@@ -193,12 +198,14 @@ class AuctionShortcodes extends AuctionsAndItems{
 
 					$lotnumCol = ( $filterByAuction )? '<td>' . $lotnum . '</td>' : '' ;
 
+					$priceCol = ( $args['preview'] )? '<td>' . $low_est . '</td><td>' . $high_est . '</td>' : '<td>'.$realized_price.'</td>' ;
+
 					$rows[] = '<tr>
 						' . $lotnumCol . '
 						<td>' . $image . '</td>
 						<td><a href="' . get_permalink() . '" target="_blank">' . $title . '</a></td>
 						<td>' . $desc_image . apply_filters( 'the_content', $item_content ) . '</td>
-						<td>'.$realized_price.'</td>
+						' . $priceCol . '
 					</tr>';
 				}
 				wp_reset_postdata();
@@ -208,46 +215,34 @@ class AuctionShortcodes extends AuctionsAndItems{
 
 			$content = ( is_array( $content ) )? implode( "\n", $content ) : $content;
 
-			$lotnum_headings = [
-				2 => '<col style="width: 10%" />',
-				3 => '<th data-hide="phone" data-type="numeric">Lot No.</th>',
-			];
+			/**
+			 * Build our HTML Table
+			 */
 
-			$format_table = '
-<div class="row" style="margin-bottom: 20px;">
-	<div class="col-sm-9 legend">
-		<strong>Legend:</strong> <span class="footable-icon footable-sort-indicator"></span> Click to sort <span class="footable-icon footable-toggle"></span> Click for item description and a link to more photos
-	</div>
-	<div class="col-sm-3" style="text-align: right;">
-		<form class="form-inline">
-			<div class="form-group">
-				<label class="sr-only" for="search-highlights">Search:</label>
-				<div class="input-group" style="width: 100%;">
-					<input type="text" value="" class="form-control input-lg" id="search-highlights" placeholder="Search" />
-					<div class="input-group-addon clear-filter">Clear</div>
-				</div>
-			</div>
-		</form>
-	</div>
-</div>
-<table class="footable metro-centric-red" data-filter="#search-highlights" data-page-size="4">
-	<colgroup>
-		%2$s
-		<col style="width: 20%%" />
-		<col style="width: 55%%" />
-		<col style="width: 15%%" />
-	</colgroup>
-	<thead><tr>
-		%3$s
-		<th data-sort-ignore="true">Thumbnail</th>
-		<th data-hide="phone,tablet">Title</th>
-		<th data-hide="all">Description</th>
-		<th data-type="numeric" data-sort-initial="descending">Realized Price</th>
-	</tr></thead>
-	<tbody>%1$s</tbody>
-</table>';
-			$rows_html = ( is_array( $rows ) )? implode( "\n", $rows ) : '';
-			$table = ( $filterByAuction )? sprintf( $format_table, $rows_html, $lotnum_headings[2], $lotnum_headings[3] ) : sprintf( $format_table, $rows_html, '', '' ) ;
+			// Load our template from an external file
+			$table_html = file_get_contents( plugin_dir_path( __FILE__ ) . '/../html/highlights.html' );
+
+			$search = ['{colgroup_cols}', '{column_headings}', '{highlight_rows}'];
+
+			$replace['colgroup_cols'] = '<col style="width: 20%" /><col style="width: 50%" />';
+			$replace['column_headings'] = '<th data-sort-ignore="true">Thumbnail</th><th data-hide="phone,tablet">Title</th><th data-hide="all">Description</th>';
+
+			if( $filterByAuction ){
+				$replace['colgroup_cols'] = '<col style="width: 10%" />' . $replace['colgroup_cols'];
+				$replace['column_headings'] = '<th data-hide="phone" data-type="numeric">Lot No.</th>' . $replace['column_headings'];
+			}
+
+			if( $args['preview'] ){
+				$replace['colgroup_cols'].= '<col style="width: 10%" /><col style="width: 10%" />';
+				$replace['column_headings'].= '<th data-type="numeric">Low Est</th><th data-type="numeric">High Est</th>';
+			} else {
+				$replace['colgroup_cols'].= '<col style="width: 20%" />';
+				$replace['column_headings'].= '<th data-type="numeric" data-sort-initial="descending">Realized Price</th>';
+			}
+
+			$replace['highlight_rows'] = ( is_array( $rows ) )? implode( "\n", $rows ) : '';
+
+			$table = str_replace( $search, $replace, $table_html );
 			$content.= $table;
 
 			set_transient( 'auction_highlights_' . $transient_id, $content, 48 * HOUR_IN_SECONDS );

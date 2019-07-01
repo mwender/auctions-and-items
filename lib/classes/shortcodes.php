@@ -109,10 +109,12 @@ class AuctionShortcodes extends AuctionsAndItems{
 			],
 			'posts_per_page' => $limit,
 			'orderby' => 'meta_value_num',
-			'meta_key' => '_lotnum',
-			'order' => 'ASC',
+			'meta_key' => '_realized',
+			'order' => 'DESC',
 		];
 
+		// Filter by auction
+		$filterByAuction = false; // Used for displaying `Lot No.` column
 		if( ! is_null( $args['auction'] ) && is_numeric( $args['auction'] ) ){
 			$term = get_term( $args['auction'], 'auction' );
 			if( $term ){
@@ -121,9 +123,11 @@ class AuctionShortcodes extends AuctionsAndItems{
 					'field' => 'term_id',
 					'terms' => $args['auction'],
 				];
+				$filterByAuction = true;
 			}
 		}
 
+		// Filter by category(s)
 		if( ! is_null( $args['categories'] ) && ! empty( $args['categories'] ) ){
 			$categories = [];
 			$categories = ( stristr( $args['categories'], ',' ) )? array_map( 'trim', explode( ',', $args['categories'] ) ) : [ $args['categories'] ] ;
@@ -135,6 +139,7 @@ class AuctionShortcodes extends AuctionsAndItems{
 			];
 		}
 
+		// Filter by tag(s)
 		if( ! is_null( $args['tags'] ) && ! empty( $args['tags'] ) ){
 			$tags = [];
 			$tags = ( stristr( $args['tags'], ',' ) )? array_map( 'trim', explode( ',', $args['tags'] ) ) : [ $args['tags'] ] ;
@@ -186,8 +191,10 @@ class AuctionShortcodes extends AuctionsAndItems{
 
 					$item_content = get_the_content() . ' [<a href="' . get_permalink() . '" target="_blank">See more photos &rarr;</a>]';
 
+					$lotnumCol = ( $filterByAuction )? '<td>' . $lotnum . '</td>' : '' ;
+
 					$rows[] = '<tr>
-						<td>' . $lotnum . '</td>
+						' . $lotnumCol . '
 						<td>' . $image . '</td>
 						<td><a href="' . get_permalink() . '" target="_blank">' . $title . '</a></td>
 						<td>' . $desc_image . apply_filters( 'the_content', $item_content ) . '</td>
@@ -200,6 +207,11 @@ class AuctionShortcodes extends AuctionsAndItems{
 			}
 
 			$content = ( is_array( $content ) )? implode( "\n", $content ) : $content;
+
+			$lotnum_headings = [
+				2 => '<col style="width: 10%" />',
+				3 => '<th data-hide="phone" data-type="numeric">Lot No.</th>',
+			];
 
 			$format_table = '
 <div class="row" style="margin-bottom: 20px;">
@@ -220,13 +232,13 @@ class AuctionShortcodes extends AuctionsAndItems{
 </div>
 <table class="footable metro-centric-red" data-filter="#search-highlights" data-page-size="4">
 	<colgroup>
-		<col style="width: 10%%" />
+		%2$s
 		<col style="width: 20%%" />
 		<col style="width: 55%%" />
 		<col style="width: 15%%" />
 	</colgroup>
 	<thead><tr>
-		<th data-hide="phone" data-type="numeric">Lot No.</th>
+		%3$s
 		<th data-sort-ignore="true">Thumbnail</th>
 		<th data-hide="phone,tablet">Title</th>
 		<th data-hide="all">Description</th>
@@ -235,7 +247,7 @@ class AuctionShortcodes extends AuctionsAndItems{
 	<tbody>%1$s</tbody>
 </table>';
 			$rows_html = ( is_array( $rows ) )? implode( "\n", $rows ) : '';
-			$table = sprintf( $format_table, $rows_html );
+			$table = ( $filterByAuction )? sprintf( $format_table, $rows_html, $lotnum_headings[2], $lotnum_headings[3] ) : sprintf( $format_table, $rows_html, '', '' ) ;
 			$content.= $table;
 
 			set_transient( 'auction_highlights_' . $transient_id, $content, 48 * HOUR_IN_SECONDS );

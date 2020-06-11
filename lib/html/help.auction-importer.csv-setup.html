@@ -1,5 +1,5 @@
 <h3>CSV Setup</h3>
-<p>Setup your CSV with the following columns: <code>LotNum</code>, <code>Title</code>, <code>Description</code>, <code>LowEst</code>, <code>HighEst</code>, <code>Realized</code>, <code>Highlight</code>, <code>Categories</code>, <code>Tags</code>, <code>iGavelLotNum</code>, and <code>BidsquareLotNum</code>. Here's an example:</p>
+<p>Setup your CSV with the following columns: <code>LotNum</code>, <code>Title</code>, <code>Description</code>, <code>LowEst</code>, <code>HighEst</code>, <code>Realized</code>, <code>Highlight</code>, <code>Categories</code>, <code>Tags</code>, <code>iGavelLotNum</code>, <code>BidsquareLotNum</code>, and <code>LiveAuctioneersID</code>. Here's an example:</p>
 
 <table class="widefat">
 	<thead>
@@ -15,6 +15,7 @@
 			<th>Tags</th>
 			<th>iGavelLotNum</th>
 			<th>BidsquareLotNum</th>
+			<th>LiveAuctioneersID</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -30,6 +31,7 @@
 			<td>bronze,bottles</td>
 			<td></td>
 			<td></td>
+			<td></td>
 		</tr>
 		<tr class="alternate">
 			<td>2</td>
@@ -43,6 +45,7 @@
 			<td>jade,bronze</td>
 			<td></td>
 			<td></td>
+			<td></td>
 		</tr>
 	</tbody>
 </table>
@@ -51,4 +54,5 @@
 <ul>
 	<li>When exporting a spreadsheet from Excel, choose "Windows Comma Separated (.csv)" as the file format.</li>
 	<li><strong>iGavel Online Auctions:</strong> Add a link to any item's corresponding iGavel auction page by adding column called <code>iGavelLotNum</code> (<em>case-sensitive</em>) to your CSV.</li>
+	<li><code>LiveAuctioneersID</code> - we're able to specify the Live Auctioneers auction ID at the Item level to allow for mutliday auctions which have multiple Live Auctioneers IDs.</li>
 </ul>

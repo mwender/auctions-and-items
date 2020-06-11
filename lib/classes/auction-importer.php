@@ -570,6 +570,18 @@ class AuctionImporter extends AuctionsAndItems{
 		if( ! empty( $item['BidsquareLotNum'] ) )
 			update_post_meta( $post_ID, '_bidsquare_lotnum', $item['BidsquareLotNum'] );
 
+		/**
+		 * LIVEAUCTIONEER LINKS
+		 *
+		 * Traditionally, we've handled these inside the "Auction"; however, with the
+		 * introduction of multiday auctions, we need allow for these links to be
+		 * generated at the Item level.
+		 *
+		 * Example: http://www.liveauctioneers.com/itemLookup/170967/43
+		 */
+		if( ! empty( $item['LiveAuctioneersID'] ) )
+			update_post_meta( $post_ID, '_liveauctioneers_id', $item['LiveAuctioneersID'] );
+
 		if ( !empty( $csvID ) && !empty( $offset ) )
 			update_post_meta( $csvID, '_last_import', $offset );
 

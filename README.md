@@ -4,6 +4,10 @@ Adds an `Items` custom post_type along with an `Auction` taxonomy. Together, the
 
 ## Changelog
 
+__Version 1.4.1 - 07/24/2020__
+
+- Updating `AuctionShortcodes::get_gallery_image()` to use `wp_get_attachment_image_src()` to retrieve the Auction Item's first attachment image source URL.
+
 __Version 1.4.0 - 06/11/2020__
 
 - Adding `LiveAuctioneersID` column to Auction Items CSV import.

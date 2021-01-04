@@ -243,7 +243,7 @@ class AuctionShortcodes extends AuctionsAndItems{
 			set_transient( 'auction_highlights_' . $transient_id, $content, 48 * HOUR_IN_SECONDS );
 		} else if( is_user_logged_in() && current_user_can( 'activate_plugins' ) ) {
 			global $post;
-			$content = '<div class="alert alert-warning" style="text-align: center;"><h4><strong>NOTICE:</strong> The highlights shown below have been pulled from cache. If the list appears incomplete, <a href=" ' . get_permalink( $post->ID ) . '?flushcache=true">CLICK HERE</a> to refresh the cache.</h4><p><em>This notice only shows to logged in Case Antiques administrators.</em></p></div>' . $content;
+			$content = '<p style="font-size: 14px; margin: -18px 0 8px 0"><a href=" ' . get_permalink( $post->ID ) . '?flushcache=true">Refresh the cache</a></p>' . $content;
 		}
 
 		if( true == $flushcache )

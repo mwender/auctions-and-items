@@ -4,6 +4,10 @@ Adds an `Items` custom post_type along with an `Auction` taxonomy. Together, the
 
 ## Changelog
 
+__Version 1.5.0 - 01/04/2021__
+
+- Replacing Flare Lightbox with [Featherlight](https://github.com/noelboss/featherlight).
+
 __Version 1.4.1 - 07/24/2020__
 
 - Updating `AuctionShortcodes::get_gallery_image()` to use `wp_get_attachment_image_src()` to retrieve the Auction Item's first attachment image source URL.

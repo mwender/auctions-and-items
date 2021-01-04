@@ -4,6 +4,10 @@ Adds an `Items` custom post_type along with an `Auction` taxonomy. Together, the
 
 ## Changelog
 
+__Version 1.6.0 - 01/04/2021__
+
+- Adding `show_search` and `show_notes` options for `[highlights]` shortcode.
+
 __Version 1.5.0 - 01/04/2021__
 
 - Replacing Flare Lightbox with [Featherlight](https://github.com/noelboss/featherlight).

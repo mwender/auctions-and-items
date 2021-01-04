@@ -85,7 +85,18 @@ class AuctionShortcodes extends AuctionsAndItems{
 			'tags' 				=> null,
 			'limit'				=> -1,
 			'preview'			=> false,
+			'show_notes'	=> true,
+			'show_search' => true,
 		), $atts );
+
+		if( $args['preview'] === 'false' ) $args['preview'] = false;
+		$args['preview'] = (bool) $args['preview'];
+
+		if( $args['show_notes'] === 'false' ) $args['show_notes'] = false;
+		$args['show_notes'] = (bool) $args['show_notes'];
+
+		if( $args['show_search'] === 'false' ) $args['show_search'] = false;
+		$args['show_search'] = (bool) $args['show_search'];
 
 		$flushcache = ( isset( $_GET['flushcache'] ) )? settype( $_GET['flushcache'], 'boolean' ) : false ;
 
@@ -155,7 +166,8 @@ class AuctionShortcodes extends AuctionsAndItems{
 			$content = array();
 			$email = ( function_exists( 'cryptx' ) )? cryptx( 'info@caseantiques.com', '', '', 0 ) : '<a href="mailto:info@caseantiques.com">info@caseantiques.com</a>' ;
 
-			$content[] = '<div class="alert alert-info highlight-alert"><p style="text-align: center">If you are interested in consigning items of this quality for future auctions, please contact us at ' . $email . '.<br />(<em>Note: Prices realized include a buyer\'s premium.</em>)</p></div>';
+			if( $args['show_notes'] )
+				$content[] = '<div class="alert alert-info highlight-alert"><p style="text-align: center">If you are interested in consigning items of this quality for future auctions, please contact us at ' . $email . '.<br />(<em>Note: Prices realized include a buyer\'s premium.</em>)</p></div>';
 
 			$posts = get_posts( $query_args );
 			$rows = ['<tr><td colspan="5">No items returned.</td></tr>'];
@@ -203,7 +215,8 @@ class AuctionShortcodes extends AuctionsAndItems{
 				}
 				wp_reset_postdata();
 			} else {
-				$content[] = '<p class="clearfix alert alert-warning" style="text-align: center">No highlighted items found for this auction.</p>';
+				if( $args['show_notes'] )
+					$content[] = '<p class="clearfix alert alert-warning" style="text-align: center">No highlighted items found for this auction.</p>';
 			}
 
 			$content = ( is_array( $content ) )? implode( "\n", $content ) : $content;
@@ -215,7 +228,7 @@ class AuctionShortcodes extends AuctionsAndItems{
 			// Load our template from an external file
 			$table_html = file_get_contents( plugin_dir_path( __FILE__ ) . '/../html/highlights.html' );
 
-			$search = ['{colgroup_cols}', '{column_headings}', '{highlight_rows}'];
+			$search = ['{colgroup_cols}', '{column_headings}', '{highlight_rows}' , '{show_search}'];
 
 			$replace['colgroup_cols'] = '<col style="width: 20%" /><col style="width: 50%" />';
 			$replace['column_headings'] = '<th data-sort-ignore="true">Thumbnail</th><th data-hide="phone,tablet">Title</th><th data-hide="all">Description</th>';
@@ -234,6 +247,7 @@ class AuctionShortcodes extends AuctionsAndItems{
 			}
 
 			$replace['highlight_rows'] = ( is_array( $rows ) )? implode( "\n", $rows ) : '';
+			$replace['show_search'] = ( $args['show_search'] )? 'block' : 'none';
 
 			$table = str_replace( $search, $replace, $table_html );
 			$content.= $table;

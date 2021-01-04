@@ -57,9 +57,16 @@ class AuctionsAndItems {
      * @return void
      */
     public function enqueue_scripts(){
-        wp_enqueue_style( 'flare-lightbox', plugin_dir_url( __FILE__ ) . 'lib/js/flare/jquery.pixelentity.flare.min.css' );
-        wp_enqueue_script( 'flare-lightbox', plugin_dir_url( __FILE__ ) . 'lib/js/flare/jquery.pixelentity.flare.min.js', array( 'jquery' ) );
-        wp_enqueue_script( 'flare-init', plugin_dir_url( __FILE__ ) . 'lib/js/flare/flare-init.js', array( 'flare-lightbox' ) );
+        wp_register_style( 'featherlight', '//cdn.jsdelivr.net/npm/featherlight@1.7.14/release/featherlight.min.css', null, '1.7.14' );
+
+        if( is_single() && 'item' == get_post_type() )
+          wp_enqueue_style( 'featherlight-gallery', '//cdn.jsdelivr.net/npm/featherlight@1.7.14/release/featherlight.gallery.min.css', ['featherlight'], '1.7.14' );
+
+        wp_register_script( 'featherlight', '//cdn.jsdelivr.net/npm/featherlight@1.7.14/release/featherlight.min.js', ['jquery'], '1.7.14', true );
+        wp_register_script( 'featherlight-gallery', '//cdn.jsdelivr.net/npm/featherlight@1.7.14/release/featherlight.gallery.min.js', ['featherlight'], '1.7.14', true );
+
+        if( is_single() && 'item' == get_post_type() )
+          wp_enqueue_script( 'item-gallery', plugin_dir_url( __FILE__ ) . 'lib/js/gallery.js', ['featherlight-gallery'], filemtime( plugin_dir_path( __FILE__ ) . 'lib/js/gallery.js'), true );
 
         if( is_tax( 'auction' ) || is_tax( 'item_tags' ) || is_tax( 'item_category' ) ){
             wp_enqueue_script( 'datatables-user' );

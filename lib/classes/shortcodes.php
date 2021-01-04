@@ -151,8 +151,6 @@ class AuctionShortcodes extends AuctionsAndItems{
 			];
 		}
 
-		//error_log( str_repeat('-', 40 ) . "\n" . '$query_args = ' . print_r( $query_args, true ) );
-
 		if ( false === ( $content = get_transient( 'auction_highlights_' . $transient_id ) ) || true == $flushcache ) {
 			$content = array();
 			$email = ( function_exists( 'cryptx' ) )? cryptx( 'info@caseantiques.com', '', '', 0 ) : '<a href="mailto:info@caseantiques.com">info@caseantiques.com</a>' ;

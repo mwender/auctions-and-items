@@ -201,6 +201,32 @@ class AuctionItem extends AuctionsAndItems{
                     echo implode(', ', $tags );
                 }
                 break;
+
+            case 'realized':
+                $realized = get_post_meta( $post_id, '_realized', true );
+                $auctions = get_the_terms( $post_id, 'auction' );
+                if( ! empty( $auctions ) ){
+                    $highest_auction_timestamp = 0;
+                    foreach( $auctions as $a ){
+                        $date = get_field( 'date', $a );
+                        if( $date ){
+                            $auction_timestamp = strtotime( $date );
+                            if( $auction_timestamp > $highest_auction_timestamp )
+                                $highest_auction_timestamp = $auction_timestamp;
+                        }
+                    }
+                }
+                $current_timestamp = current_time( 'timestamp' );
+                if( $current_timestamp < $highest_auction_timestamp ){
+                    echo '<code style="padding: 4px; border-radius: 3px; background-color: #999; color: #333;">TBD</code>';
+                } else {
+                    if( ! empty( $realized ) && is_numeric( $realized ) ){
+                        echo AuctionShortcodes::format_price( $realized );
+                    } else {
+                        echo '<code style="padding: 4px; border-radius: 3px; background-color: #f00; color: #fff;">NOT SOLD</code>';
+                    }
+                }
+                break;
         }
     }
 
@@ -219,6 +245,7 @@ class AuctionItem extends AuctionsAndItems{
             'auction' => 'Auctions',
             'item_categories' => 'Categories',
             'item_tags' => 'Tags',
+            'realized' => 'Sold',
             'date' => 'Date',
         );
         return $defaults;

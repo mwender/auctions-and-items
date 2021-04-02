@@ -44,7 +44,7 @@ class AuctionTaxonomy extends AuctionsAndItems{
      * @return void
      */
     public function admin_init_callback(){
-        add_action( 'auction_edit_form', array( $this, 'taxonomy_archive_options_for_auction' ) , 10, 2 );
+        //add_action( 'auction_edit_form', array( $this, 'taxonomy_archive_options_for_auction' ) , 10, 2 );
     }
 
     /**
@@ -357,8 +357,8 @@ add_action( 'admin_init', array( $AuctionTaxonomy, 'admin_init_callback' ) );
 add_action( 'admin_enqueue_scripts', array( $AuctionTaxonomy, 'admin_enqueue_scripts' ) );
 
 // Handle additional meta fields for auctions
-add_action( 'edited_auction', array( $AuctionTaxonomy,'save_auction_callback' ), 10, 2 );
-add_action( 'delete_auction', array( $AuctionTaxonomy, 'delete_auction_callback' ), 10, 2 );
+//add_action( 'edited_auction', array( $AuctionTaxonomy,'save_auction_callback' ), 10, 2 );
+//add_action( 'delete_auction', array( $AuctionTaxonomy, 'delete_auction_callback' ), 10, 2 );
 
 // Modifying query for taxonomy-auction.php
 add_action( 'pre_get_posts', array( $AuctionTaxonomy, 'pre_get_posts' ) );

@@ -1,0 +1,14 @@
+{
+    "name": "mwender/auctions-and-items",
+    "description": "WordPress plugin for Auctions with Item CPTs.",
+    "type": "wordpress-plugin",
+    "require": {
+        "a5hleyrich/wp-background-processing": "^1.0"
+    },
+    "authors": [
+        {
+            "name": "Michael Wender",
+            "email": "michael@michaelwender.com"
+        }
+    ]
+}

@@ -4,6 +4,10 @@ Adds an `Items` custom post_type along with an `Auction` taxonomy. Together, the
 
 ## Changelog
 
+__Version 1.8.0 - 04/05/2021__
+
+- Adding `wp items unsold` for managing "Unsold" items.
+
 __Version 1.7.1 - 04/02/2021__
 
 - Removing legacy Auction Taxonomy Option fields.

@@ -4,7 +4,7 @@
 	Plugin URI:
 	Description: Adds an `auction` taxonomy with `Item` custom post_types.
 	Author: Michael Wender
-	Version: 1.7.1
+	Version: 1.8.0
 	Author URI: http://michaelwender.com
  */
 /*  Copyright 2015-21  Michael Wender  (email : michael@michaelwender.com)
@@ -22,6 +22,7 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+require 'vendor/autoload.php';
 
 class AuctionsAndItems {
     const VER = '1.3.0';
@@ -224,4 +225,12 @@ require_once( 'lib/classes/taxonomy.item-tags.php' );
 
 require_once( 'lib/classes/auction-importer.php' );
 require_once( 'lib/classes/shortcodes.php' );
+
+// Setup background process for deleting items
+require_once( 'lib/classes/background-delete-item-process.php' );
+$GLOBALS['BackgroundDeleteItemProcess'] = new AAI_Delete_Item_Process(); // We must set this as an explicit global in order for it to be available inside WPCLI
+
+// Misc function files
+require_once( 'lib/fns/wpcli.php' );
+require_once( 'lib/fns/utilities.php' );
 ?>

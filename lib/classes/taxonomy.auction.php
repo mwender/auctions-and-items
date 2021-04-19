@@ -109,6 +109,8 @@ class AuctionTaxonomy extends AuctionsAndItems{
                 'label' => 'Auctions',
                 'labels' => array( 'singular_name' => 'Auction', 'search_items' => 'Search Auctions', 'popular_items' => 'Popular Auctions', 'all_items' => 'All Auctions', 'parent_item' => 'Parent Auction', 'parent_item_colon' => 'Parent Auction:', 'edit_item' => 'Edit Auction', 'update_item' => 'Update Auction', 'add_new_item' => 'Add New Auction', 'new_item_name' => 'New Auction Name' ),
                 'hierarchical' => true,
+                'public' => true,
+                'show_in_nav_menus' => true,
                 'query_var' => true
             ) );
         $wpdb->auctionmeta = $wpdb->prefix.'auctionmeta'; // What am I doing here?
@@ -256,12 +258,29 @@ class AuctionTaxonomy extends AuctionsAndItems{
                 $data[$x]['desc'] = $desc_image . apply_filters( 'the_content', $item_content );
 
                 // Thumbnail
+                /*
                 $img = genesis_get_image( array(
                     'format'  => 'html',
                     'size'    => genesis_get_option( 'image_size' ),
                     'context' => 'archive',
                     'attr'    => genesis_parse_attr( 'entry-image', array ( 'alt' => get_the_title() ) ),
                 ) );
+                */
+                $images = get_children( 'post_type=attachment&post_mime_type=image&post_parent=' . get_the_ID() );
+
+                $first_image = get_posts([
+                    'post_parent'     => get_the_ID(),
+                    'order'           => 'ASC',
+                    'orderby'         => 'menu_order',
+                    'post_type'       => 'attachment',
+                    'fields'          => 'ids',
+                    'posts_per_page'  => 1,
+                ]);
+
+                //error_log( '🔔 $first_image = ' . print_r($first_image,true) );
+                $attachment_id = ( is_array( $first_image ) )? $first_image[0] : null ;
+                $img = wp_get_attachment_image( $attachment_id, 'medium', false, ['alt' => get_the_title()] );
+                //error_log( '🔔 $img = ' . print_r($img,true) . "\n\$attachment_id = " . $attachment_id );
                 $permalink = get_permalink();
                 $data[$x]['thumbnail'] = sprintf( '<div class="image-frame"><span class="helper"></span><a href="%1$s" aria-hidden="true">%2$s</a></div><h2 class="entry-title"><a href="%4$s">%3$s</a></h2>', $permalink, $img, $title, $permalink );
 

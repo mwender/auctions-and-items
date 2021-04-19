@@ -271,7 +271,7 @@ class AuctionItem extends AuctionsAndItems{
             'label' => 'Items',
             'labels' => $labels,
             'description' => 'Slides appear on the home page in the "Featured" slider.',
-            'has_archive' => false,
+            'has_archive' => true,
             'public' => true,
             'exclude_from_search' => false,
             'show_ui' => true,

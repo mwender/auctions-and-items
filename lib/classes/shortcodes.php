@@ -164,10 +164,9 @@ class AuctionShortcodes extends AuctionsAndItems{
 
 		if ( false === ( $content = get_transient( 'auction_highlights_' . $transient_id ) ) || true == $flushcache ) {
 			$content = array();
-			$email = ( function_exists( 'cryptx' ) )? cryptx( 'info@caseantiques.com', '', '', 0 ) : '<a href="mailto:info@caseantiques.com">info@caseantiques.com</a>' ;
-
+			$selling_page_url = site_url( 'selling' );
 			if( $args['show_notes'] )
-				$content[] = '<div class="alert alert-info highlight-alert"><p style="text-align: center">If you are interested in consigning items of this quality for future auctions, please contact us at ' . $email . '.<br />(<em>Note: Prices realized include a buyer\'s premium.</em>)</p></div>';
+				$content[] = '<div class="alert alert-info highlight-alert"><p style="text-align: center">If you are interested in consigning items of this quality for future auctions, please visit our <a href="' . $selling_page_url . '">Selling page</a>.<br />(<em>Note: Prices realized include a buyer\'s premium.</em>)</p></div>';
 
 			$posts = get_posts( $query_args );
 			$rows = ['<tr><td colspan="5">No items returned.</td></tr>'];

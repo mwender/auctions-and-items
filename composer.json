@@ -3,7 +3,8 @@
     "description": "WordPress plugin for Auctions with Item CPTs.",
     "type": "wordpress-plugin",
     "require": {
-        "a5hleyrich/wp-background-processing": "^1.0"
+        "a5hleyrich/wp-background-processing": "^1.0",
+        "zordius/lightncandy": "^1.2"
     },
     "authors": [
         {

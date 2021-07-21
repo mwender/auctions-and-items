@@ -4,6 +4,12 @@ Adds an `Items` custom post_type along with an `Auction` taxonomy. Together, the
 
 ## Changelog
 
+__Version 1.8.1 - 07/21/2021__
+
+- Removing Genesis Theme dependency when retrieving first attachment image for an Auction Item.
+- Setting `has_archive` to `true` for Auction Items so that we can build archives for auctions in Elementor.
+- Removing email from Auction Highlights note, adding link to Selling page
+
 __Version 1.8.0 - 04/05/2021__
 
 - Adding `wp items unsold` for managing "Unsold" items.

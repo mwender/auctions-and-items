@@ -1,0 +1,16 @@
+{
+  "name": "centric-pro",
+  "version": "1.0.0",
+  "description": "Auctions and Auction Items plugin for WordPress.",
+  "main": "style.css",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Michael Wender",
+  "license": "GPLv2",
+  "devDependencies": {
+    "grunt": "^1.3.0",
+    "grunt-contrib-less": "^3.0.0",
+    "grunt-contrib-watch": "^1.1.0"
+  }
+}

@@ -1,0 +1,54 @@
+/* Elementor Theme Styles */
+@import '_reset';
+@import 'bootstrap/main.less';
+@import '_defaults';
+@import '_site-header-and-nav';
+@import '_footer';
+@import '_colors';
+@import '_media-queries';
+
+.site-inner{
+  background-color: #fff;
+}
+/*
+body.elementor-template-full-width .site-container{
+  padding-top: 120px;
+}
+*/
+.elementor-widget-wp-widget-featured-item-cats-and-tags{
+  h3{
+    text-align: center;
+  }
+}
+.case-green{
+  .elementor-widget-wp-widget-featured-item-cats-and-tags{
+    h3 a{
+      color: #fff;
+    }
+    h3{
+      margin-bottom: 3rem;
+    }
+    div.item-thumbnail{
+      border-radius: 5px;
+      margin-bottom: 1rem;
+    }
+  }
+}
+
+@media screen and (max-width: 1023px){
+  #top-bar{
+    display: block;
+    text-align: center;
+    height: auto;
+    line-height: 1.5em;
+    padding-bottom: 8px;
+  }
+  #top-bar section.widget{
+    padding-top: 8px;
+  }
+  #top-bar section.widget.widget_text,
+  #top-bar .search-form
+  {
+    float: none;
+  }
+}

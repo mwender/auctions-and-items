@@ -1,0 +1,423 @@
+/*
+WordPress Admin Bar
+---------------------------------------------------------------------------------------------------- */
+#wpadminbar{
+	z-index: 1999;
+}
+
+/*
+Top Bar
+---------------------------------------------------------------------------------------------------- */
+@topbar_h: 40px;
+@adminbar_h: 32px;
+@bumper_h: 160px;
+
+#top-bar{
+	background-color: #333;
+	height: @topbar_h;
+	line-height: @topbar_h;
+	color: #fff;
+	text-align: center;
+	/*position: fixed;*/
+	top: 0;
+	left: 0;
+	z-index: 999;
+	width: 100%;
+	text-align: right;
+
+	a{
+		color: #fff;
+
+		&:hover{
+			text-decoration: underline;
+		}
+	}
+
+	& + .site-header{
+		top: @topbar_h;
+	}
+
+	& ~ .bumper {
+		min-height: @bumper_h + @topbar_h;
+		display: none;
+	}
+
+	.search-form{
+		width: 368px;
+		margin: 0 5px 0 8px;
+		float: right;
+		white-space: nowrap;
+
+		input{
+			display: inline-block;
+		}
+
+		input[name="s"]{
+			padding: 4px;
+			width: 280px;
+		}
+
+		input[type="submit"] {
+			border: 0;
+			position: relative;
+			height: 30px;
+			padding: 0 12px;
+			margin-left: 6px;
+			width: auto;
+			font-weight: normal;
+			text-transform: capitalize;
+			background-color: lighten(#000,45%);
+			border-radius: 3px;
+			-webkit-border-radius: 3px;
+			-moz-border-radius: 3px;
+
+			&:hover{
+				background-color: lighten(#000,60%);
+			}
+		}
+	}
+
+	section.widget{
+		margin: 0;
+		display: inline-block;
+
+		&.widget_text{
+			float: left;
+			margin: 0 8px;
+			font-size: 14px;
+		}
+	}
+}
+
+.admin-bar{
+	#top-bar{
+		top: @adminbar_h;
+
+		& + .site-header{
+			top: @adminbar_h + @topbar_h;
+		}
+	}
+}
+
+/*
+Site Header
+---------------------------------------------------------------------------------------------------- */
+
+.site-header {
+	background-color: #13afdf;
+	left: 0;
+	/*position: fixed;*/
+	top: 0;
+	width: 100%;
+	z-index: 999;
+
+	.site-title{
+		font-size: 36px;
+		padding-top: 0px;
+
+		a{
+			background-size: 270px 60px !important;
+		}
+	}
+
+	.wrap{
+		/*min-height: 120px;*/
+		/*padding: 30px;*/
+		max-width: 100%;
+
+	  background-color: rgba(255, 255, 255, 0.1);
+	  min-height: 60px;
+	  padding: 0 40px;
+	}
+}
+
+.admin-bar{
+	.site-header{
+		top: @adminbar_h;
+	}
+}
+
+.bumper {
+	min-height: @bumper_h;
+}
+
+.site-header,
+.site-header .wrap,
+.site-description {
+	-webkit-transition: all 0.4s ease-in-out;
+	-moz-transition:    all 0.4s ease-in-out;
+	transition:         all 0.4s ease-in-out;
+}
+
+/* Title Area
+--------------------------------------------- */
+
+.title-area {
+	float: left;
+	padding: 0;
+	width: 300px;
+}
+
+.header-full-width .title-area {
+	width: 100%;
+}
+
+.site-title{
+	font-family: 'Spinnaker', sans-serif;
+	font-size: 60px;
+	font-weight: 700;
+	line-height: 1.2;
+
+	.site-header & a{
+		background-size: contain !important;
+		background-position: center !important;
+	}
+
+	.site-header & a,
+	.site-header & a:hover{
+		color: #fff;
+		letter-spacing: 2px;
+		text-shadow: 3px 3px rgba( 0, 0, 0, 0.1 );
+		text-transform: uppercase;
+	}
+
+	.header-image & > a{
+		float: left;
+		min-height: 80px;
+		width: 100%;
+	}
+}
+
+.site-description {
+    height: 0;
+    text-indent: -9999px;
+}
+
+.site-description,
+.site-title {
+	margin-bottom: 0;
+}
+
+.header-image .site-description,
+.header-image .site-title {
+	display: block;
+	text-indent: -9999px;
+}
+
+/* Widget Area
+--------------------------------------------- */
+
+.site-header .widget-area {
+	color: #fff;
+	float: right;
+	text-align: right;
+	padding-top: 10px;
+	margin-top: 4px;
+	width: 700px;
+
+	@media (min-width : 1024px) and (max-width : 1060px) {
+		width: 660px;
+
+		& .genesis-nav-menu li a{
+			padding: 18px 15px;
+		}
+	}
+}
+
+.site-header .widget-area a,
+.site-header .widget-area a:hover {
+	color: #fff;
+}
+
+
+
+/*
+Site Navigation
+---------------------------------------------------------------------------------------------------- */
+
+.genesis-nav-menu {
+	-webkit-font-smoothing: subpixel-antialiased;
+	clear: both;
+	font-size: 16px;
+	line-height: 1;
+	width: 100%;
+}
+
+.genesis-nav-menu .menu-item {
+	display: inline-block;
+	text-align: left;
+}
+
+.genesis-nav-menu li a {
+	color: #fff;
+	display: block;
+	padding: 18px;
+}
+
+.genesis-nav-menu li a:hover,
+.genesis-nav-menu .current-menu-item > a {
+	background-color: rgba(255, 255, 255, 0.1);
+	color: #fff;
+	text-decoration: none;
+}
+
+.genesis-nav-menu .sub-menu {
+	background-color: #13afdf;
+	left: -9999px;
+	opacity: 0;
+	position: absolute;
+	-webkit-transition: opacity .4s ease-in-out;
+	-moz-transition:    opacity .4s ease-in-out;
+	-ms-transition:     opacity .4s ease-in-out;
+	-o-transition:      opacity .4s ease-in-out;
+	transition:         opacity .4s ease-in-out;
+	width: 200px;
+	z-index: 99;
+}
+
+.genesis-nav-menu .sub-menu a {
+	background-color: rgba(255, 255, 255, 0.2);
+	font-size: 14px;
+	padding: 20px;
+	position: relative;
+	width: 200px;
+}
+
+ul.genesis-nav-menu .sub-menu a:hover {
+	background-color: rgba(255, 255, 255, 0.3);
+}
+
+.genesis-nav-menu .sub-menu .sub-menu {
+	margin: -54px 0 0 199px;
+}
+
+.genesis-nav-menu .menu-item:hover {
+	position: static;
+}
+
+.genesis-nav-menu .menu-item:hover > .sub-menu {
+	left: auto;
+	opacity: 1;
+}
+
+.genesis-nav-menu > .first > a {
+	padding-left: 0;
+}
+
+.genesis-nav-menu > .last > a {
+	padding-right: 0;
+}
+
+.genesis-nav-menu > .right {
+	color: #fff;
+	float: right;
+	list-style-type: none;
+}
+
+.genesis-nav-menu > .right > a {
+	display: inline-block;
+}
+
+.genesis-nav-menu > .date {
+	padding: 22px;
+}
+
+.genesis-nav-menu > .search {
+	padding: 10px 0 0;
+}
+
+.genesis-nav-menu > .search input[type="search"] {
+	font-size: 14px;
+	padding: 12px 24px;
+}
+
+/* Site Header Navigation
+--------------------------------------------- */
+
+.site-header .genesis-nav-menu li li {
+	margin-left: 0;
+}
+
+/* Primary Navigation
+--------------------------------------------- */
+
+.nav-primary {
+	position: relative;
+	z-index: 98;
+}
+
+.nav-primary .genesis-nav-menu li .sub-menu,
+.nav-primary {
+	background-color: #2e2f33;
+}
+
+/* Responsive Menu
+--------------------------------------------- */
+
+#responsive-menu-icon {
+	cursor: pointer;
+	display: none;
+	text-align: center;
+}
+
+#responsive-menu-icon::before {
+	-webkit-font-smoothing: antialiased;
+	color: #fff;
+	content: "\f333";
+	font: normal 20px/1 'dashicons';
+	line-height: 1;
+	margin: 0 auto;
+	speak: none;
+	text-transform: none;
+}
+
+/* Home Widgets 1 Section Menu
+--------------------------------------------- */
+.home-widgets-1 .widget_nav_menu{
+	clear: both;
+	width: 100%;
+}
+.home-widgets-1 ul.menu li{
+	display: inline;
+	margin: 0 3px;
+}
+.home-widgets-1 ul.menu li a{
+	background: rgba(255,255,255,.75);
+	padding: 2px 8px;
+	border-radius: 20px;
+	width: 200px;
+	display: inline-block;
+	color: #000;
+	font-weight: bold;
+	white-space: nowrap;
+	overflow: hidden;
+}
+.home-widgets-1 ul.menu li a:hover{
+	background-color: rgba(255,255,255,.2);
+	color: #fff;
+}
+.home-widgets{
+	.home-widgets-2,
+	.home-widgets-3,
+	.home-widgets-4,
+	.home-widgets-5{
+		.clearfix();
+
+		.widget_nav_menu{
+			width: 31%;
+			margin: 0 1%;
+			float: left;
+			clear: none;
+			.clearfix();
+		}
+	}
+}
+
+/*
+.home-widgets-1 ul.menu li:after{
+	content: ' \2022 ';
+}
+.home-widgets-1 ul.menu li:last-child:after{
+	content: none;
+}
+/**/

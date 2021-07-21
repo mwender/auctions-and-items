@@ -1,0 +1,87 @@
+/*
+Widgets
+---------------------------------------------------------------------------------------------------- */
+
+.widget {
+	margin-bottom: 40px;
+	word-wrap: break-word;
+}
+
+.widget-area .widget:last-child {
+	margin-bottom: 0;
+}
+
+.widget ol > li {
+	list-style-position: inside;
+	list-style-type: decimal;
+	padding-left: 20px;
+	text-indent: -20px;
+}
+
+.widget li li {
+	border: none;
+	margin: 0 0 0 30px;
+	padding: 0;
+}
+
+.widget_calendar table {
+	width: 100%;
+}
+
+.widget_calendar td,
+.widget_calendar th {
+	text-align: center;
+}
+
+/* Featured Content
+--------------------------------------------- */
+
+.featured-content .entry {
+	border: none;
+	margin-bottom: 0;
+}
+
+.featuredpost .entry {
+	margin-bottom: 30px;
+}
+
+.featured-content .entry-title a {
+	color: #2e2f33;
+}
+
+.widget-area .featured-content .entry-title a:hover {
+	color: #000;
+}
+
+.featured-content .entry-title {
+	font-size: 20px;
+}
+
+/* Auction Item Categories/Tags
+--------------------------------------------- */
+.featured-item-cats-and-tags{
+	.item-thumbnail{
+		height: 250px;
+	}
+	h3{
+		margin-bottom: 0;
+	}
+	.col-sm-4{
+		margin-bottom: 2rem;
+	}
+
+	@media screen and (max-width: 768px) {
+		.item-thumbnail{
+			width: 50%;
+			margin: 0 auto;
+			height: 300px;
+		}
+    .row-flexbox{
+    	display: block;
+
+    	.col-sm-4{
+    		display: block;
+    	}
+    }
+	}
+}

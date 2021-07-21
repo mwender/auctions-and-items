@@ -3,3 +3,4 @@ bower_components/*
 lib/js/datatables/DataTables.zip
 *.bkup
 /vendor/
+node_modules/

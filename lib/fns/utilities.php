@@ -2,6 +2,25 @@
 
 namespace AuctionsAndItems\utilities;
 
+/**
+ * Formats a number in USD.
+ *
+ * @param      int  $price  The price
+ *
+ * @return     string  Input formatted as USD.
+ */
+function format_price( $price ){
+  settype( $price, 'int' );
+  return '$'. number_format( str_replace( '$', '', $price ), 2 );
+}
+
+/**
+ * Determines whether the specified item identifier is sold.
+ *
+ * @param      int  $item_id  The item ID
+ *
+ * @return     bool    True if the specified item identifier is sold, False otherwise.
+ */
 function is_sold( $item_id ){
   $realized = get_post_meta( $item_id, '_realized', true );
   $auctions = get_the_terms( $item_id, 'auction' );

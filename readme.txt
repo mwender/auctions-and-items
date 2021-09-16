@@ -18,12 +18,15 @@ This plugin supports the display of large, multi-item auctions. Each Item post f
 
 == Changelog ==
 
+= 1.8.2 =
+* Updating CSS pre-processor to SCSS, moving build process to NPM.
+* Building README via `grunt readme`.
+* Adding auction viewer overlay logo.
+
 = 1.8.1 =
 * Removing Genesis Theme dependency when retrieving first attachment image for an Auction Item.
 * Setting `has_archive` to `true` for Auction Items so that we can build archives for auctions in Elementor.
 * Removing email from Auction Highlights note, adding link to Selling page.
-* Updating CSS pre-processor to SCSS, moving build process to NPM.
-* Building README via `grunt readme`.
 
 = 1.8.0 =
 * Adding `wp items unsold` for managing "Unsold" items.

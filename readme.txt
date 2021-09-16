@@ -1,60 +1,60 @@
-# Auctions and Items #
-**Contributors:** [TheWebist](https://profiles.wordpress.org/TheWebist)  
-**Donate link:** https://mwender.com/  
-**Tags:** comments, spam  
-**Requires at least:** 4.5  
-**Tested up to:** 5.8.0  
-**Requires PHP:** 5.6  
-**Stable tag:** 1.8.1  
-**License:** GPLv2 or later  
-**License URI:** https://www.gnu.org/licenses/gpl-2.0.html  
+=== Auctions and Items ===
+Contributors: TheWebist
+Donate link: https://mwender.com/
+Tags: comments, spam
+Requires at least: 4.5
+Tested up to: 5.8.0
+Requires PHP: 5.6
+Stable tag: 1.8.1
+License: GPLv2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 Adds an `Items` CPT along with an `Auction` taxonomy. Together, these provide the means for displaying auction catalogs with WordPress.
 
-## Description ##
+== Description ==
 
 This plugin supports the display of large, multi-item auctions. Each Item post features a gallery of high-resolution images allowing site visitors to easily view and assess auction items.
 
 
-## Changelog ##
+== Changelog ==
 
-### 1.8.1 ###
+= 1.8.1 =
 * Removing Genesis Theme dependency when retrieving first attachment image for an Auction Item.
 * Setting `has_archive` to `true` for Auction Items so that we can build archives for auctions in Elementor.
 * Removing email from Auction Highlights note, adding link to Selling page
 
-### 1.8.0 ###
+= 1.8.0 =
 * Adding `wp items unsold` for managing "Unsold" items.
 
-### 1.7.1 ###
+= 1.7.1 =
 * Removing legacy Auction Taxonomy Option fields.
 
-### 1.7.0 ###
+= 1.7.0 =
 * Adding "Realized" column to Item CPT admin listing.
 
-### 1.6.0 ###
+= 1.6.0 =
 * Adding `show_search` and `show_notes` options for `[highlights]` shortcode.
 
-### 1.5.0 ###
+= 1.5.0 =
 * Replacing Flare Lightbox with [Featherlight](https://github.com/noelboss/featherlight).
 
-### 1.4.1 ###
+= 1.4.1 =
 * Updating `AuctionShortcodes::get_gallery_image()` to use `wp_get_attachment_image_src()` to retrieve the Auction Item's first attachment image source URL.
 
-### 1.4.0 ###
+= 1.4.0 =
 * Adding `LiveAuctioneersID` column to Auction Items CSV import.
 
-### 1.3.0 ###
+= 1.3.0 =
 * Deleting item image attachments during item delete
 
-### 1.2.0 ###
+= 1.2.0 =
 * Adding `Item Tags` custom taxonomy
 * Adding Bidsquare lot numbers to auction import
 
-### 1.1.0 ###
+= 1.1.0 =
 * Adding Next/Previous navigation to items.
 * Table and List view options for Auction archives.
 * Enhanced table view for Auction Highlights shortcode.
 
-### 1.0 ###
+= 1.0 =
 * Initial version ported from code integrated inside a WordPress theme.

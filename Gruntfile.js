@@ -1,48 +1,56 @@
-module.exports = function(grunt) {
-  grunt.initConfig({
-    less: {
-      development: {
-        options: {
-          compress: false,
-          yuicompress: false,
-          optimization: 2,
-          sourceMap: true,
-          sourceMapFilename: 'lib/css/main.css.map',
-          sourceMapBasepath: 'lib/less',
-          sourceMapURL: 'main.css.map'
-        },
-        files: {
-          // target.css file: source.less file
-          'lib/css/main.css': 'lib/less/main.less'
-        }
+module.exports = function( grunt ) {
+
+  'use strict';
+
+  // Project configuration
+  grunt.initConfig( {
+
+    pkg: grunt.file.readJSON( 'package.json' ),
+
+    addtextdomain: {
+      options: {
+        textdomain: 'test-plugin',
       },
-      production: {
+      update_all_domains: {
         options: {
-          compress: true,
-          yuicompress: true,
-          optimization: 2
+          updateDomains: true
         },
+        src: [ '*.php', '**/*.php', '!\.git/**/*', '!bin/**/*', '!node_modules/**/*', '!tests/**/*' ]
+      }
+    },
+
+    wp_readme_to_markdown: {
+      your_target: {
         files: {
-          // target.css file: source.less file
-          'lib/css/main.css': 'lib/less/main.less'
+          'README.md': 'readme.txt'
         }
       },
     },
-    watch: {
-      styles: {
-        files: ['lib/less/**/*.less','js/**/*.js'], // which files to watch
-        tasks: ['less:development'],
+
+    makepot: {
+      target: {
         options: {
-          nospawn: true,
-          livereload: true
+          domainPath: '/languages',
+          exclude: [ '\.git/*', 'bin/*', 'node_modules/*', 'tests/*' ],
+          mainFile: 'test-plugin.php',
+          potFilename: 'test-plugin.pot',
+          potHeaders: {
+            poedit: true,
+            'x-poedit-keywordslist': true
+          },
+          type: 'wp-plugin',
+          updateTimestamp: true
         }
       }
-    }
-  });
+    },
+  } );
 
-  grunt.loadNpmTasks('grunt-contrib-less');
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.registerTask('builddev', ['less:development']);
-  grunt.registerTask('build', ['less:production']);
-  grunt.registerTask('default', ['watch']);
+  grunt.loadNpmTasks( 'grunt-wp-i18n' );
+  grunt.loadNpmTasks( 'grunt-wp-readme-to-markdown' );
+  grunt.registerTask( 'default', [ 'i18n','readme' ] );
+  grunt.registerTask( 'i18n', ['addtextdomain', 'makepot'] );
+  grunt.registerTask( 'readme', ['wp_readme_to_markdown'] );
+
+  grunt.util.linefeed = '\n';
+
 };

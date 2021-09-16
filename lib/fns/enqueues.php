@@ -18,7 +18,7 @@ function enqueue_scripts(){
   wp_register_script( 'featherlight', '//cdn.jsdelivr.net/npm/featherlight@1.7.14/release/featherlight.min.js', ['jquery'], '1.7.14', true );
   wp_register_script( 'featherlight-gallery', '//cdn.jsdelivr.net/npm/featherlight@1.7.14/release/featherlight.gallery.min.js', ['featherlight'], '1.7.14', true );
 
-  wp_enqueue_style( 'aai-base-styles', AAI_PLUGIN_URL . '/lib/css/main.css', null, filemtime( AAI_PLUGIN_PATH . '/lib/css/main.css') );
+  wp_enqueue_style( 'aai-base-styles', AAI_PLUGIN_URL . '/lib/' . AAI_CSS_DIR . '/main.css', null, filemtime( AAI_PLUGIN_PATH . '/lib/' . AAI_CSS_DIR . '/main.css') );
 
   if( is_single() && 'item' == get_post_type() )
     wp_enqueue_script( 'item-gallery', AAI_PLUGIN_URL . 'lib/js/gallery.js', ['featherlight-gallery'], filemtime( AAI_PLUGIN_PATH . '/lib/js/gallery.js'), true );

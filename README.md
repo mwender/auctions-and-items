@@ -4,6 +4,10 @@ Adds an `Items` custom post_type along with an `Auction` taxonomy. Together, the
 
 ## Changelog
 
+__Version 1.8.1.0__
+- Removing `StartPrice` from Item Importer.
+- Updating importer to work with Caspio CSV export.
+
 __Version 1.8.0 - 04/05/2021__
 
 - Adding `wp items unsold` for managing "Unsold" items.

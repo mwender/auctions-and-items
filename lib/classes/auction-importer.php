@@ -457,7 +457,7 @@ class AuctionImporter extends AuctionsAndItems{
 	 * 		An array of arguments.
 	 *
 	 *		@type array		$item			Item array with keys Title, Description, LotNum,
-	 *										LowEst, HighEst, StartPrice, Realized, and Highlight
+	 *										LowEst, HighEst, Realized, and Highlight
 	 *		@type int		$auction		Auction taxonomy ID.
 	 *		@type string 	$auction_slug 	Auction taxonomy slug.
 	 *		@type int		$csvID			Post ID of the CSV this item was imported from.
@@ -482,18 +482,23 @@ class AuctionImporter extends AuctionsAndItems{
 		$tagitem = true;
 
 		// if this item exists, add the ID to the query so that it gets updated
-		if ( $postid = $this->auction_object_exists( array( 'exists' => 'item', 'lotnum' => $item['LotNum'], 'auction_slug' => $auction_slug ) ) ) {
+		if ( $postid = $this->auction_object_exists( array( 'exists' => 'item', 'lotnum' => $item['LotNumber'], 'auction_slug' => $auction_slug ) ) ) {
 			$post['ID'] = $postid;
 			$tagitem = false;
 		}
 
-		$post['post_title'] = $item['Title'];
-		$post['post_content'] = $item['Description'];
+		// Skip empty items with empty or non-numeric Lot Numbers:
+		if( empty( $item['LotNumber'] ) || ! is_numeric( $item['LotNumber'] ) )
+			return;
+
+		$item_title = 'Lot ' . $item['LotNumber'] . ': ' . $item['Lead'];
+		$post['post_title'] = $item_title;
+		$post['post_content'] = $item['Description'] . "\n\nPROVENANCE: " . $item['ProvenanceLine'] . "\n\nCONDITION: " . $item['Condition'];
 		$post['post_type'] = 'item';
 		$post['post_status'] = 'publish';
 		$valid_nolot_strings = array( 'no lot', 'nolot', 'no-lot' );
 		foreach( $valid_nolot_strings as $string ){
-			if( stristr( strtolower( $item['Title'] ), $string ) )
+			if( stristr( strtolower( $item_title ), $string ) )
 				$post['post_status'] = 'draft';
 		}
 		$post_ID = wp_insert_post( $post );
@@ -523,9 +528,9 @@ class AuctionImporter extends AuctionsAndItems{
 		}
 
 		// assign the item to any specified categories
-		if ( ! empty( $item['Categories'] ) ) {
+		if ( ! empty( $item['CategoryName'] ) ) {
 			$terms = array();
-			$item_categories = explode( ',', $item['Categories'] );
+			$item_categories = explode( ',', $item['CategoryName'] );
 
 			foreach ( $item_categories as $category ) {
 				if( $term = term_exists( $category, 'item_category' ) ){
@@ -542,13 +547,13 @@ class AuctionImporter extends AuctionsAndItems{
 			wp_set_object_terms( $post_ID, null, 'item_category' ); // remove all categories for an item
 		}
 
-		$meta_fields = [ '_lotnum' => 'LotNum', '_low_est' => 'LowEst', '_high_est' => 'HighEst', '_start_price' => 'StartPrice', '_realized' => 'Realized' ];
+		$meta_fields = [ '_lotnum' => 'LotNumber', '_low_est' => 'LowEstimate', '_high_est' => 'HighEstimate', '_realized' => 'HammerPrice' ];
 		foreach ( $meta_fields as $meta_key => $item_key ) {
 			$value = ( isset( $item[$item_key] ) )? $item[$item_key] : null ;
 			update_post_meta( $post_ID, $meta_key, $value );
 		}
 
-		$highlight = ( $item['Highlight'] == 'TRUE' || $item['Highlight'] == 'true' )? 1 : 0;
+		$highlight = boolval( $item['isHighlight'] );
 		update_post_meta( $post_ID, '_highlight', $highlight );
 
 		/**
@@ -559,7 +564,7 @@ class AuctionImporter extends AuctionsAndItems{
 		 *
 		 * http://bid.igavelauctions.com/Bidding.taf?_function=detail&Auction_uid1=2872353
 		 */
-		if ( !empty( $item['iGavelLotNum'] ) )
+		if ( array_key_exists( 'iGavelLotNum', $item ) && !empty( $item['iGavelLotNum'] ) )
 			update_post_meta( $post_ID, '_igavel_lotnum', $item['iGavelLotNum'] );
 
 		/**
@@ -567,7 +572,7 @@ class AuctionImporter extends AuctionsAndItems{
 		 *
 		 * Example: http://auctions.bidsquare.com/view-auctions/catalog/id/891/lot/12362
 		 */
-		if( ! empty( $item['BidsquareLotNum'] ) )
+		if( array_key_exists( 'BidsquareLotNum', $item ) && ! empty( $item['BidsquareLotNum'] ) )
 			update_post_meta( $post_ID, '_bidsquare_lotnum', $item['BidsquareLotNum'] );
 
 		/**
@@ -579,7 +584,7 @@ class AuctionImporter extends AuctionsAndItems{
 		 *
 		 * Example: http://www.liveauctioneers.com/itemLookup/170967/43
 		 */
-		if( ! empty( $item['LiveAuctioneersID'] ) )
+		if( array_key_exists( 'LiveAuctioneersID', $item ) && ! empty( $item['LiveAuctioneersID'] ) )
 			update_post_meta( $post_ID, '_liveauctioneers_id', $item['LiveAuctioneersID'] );
 
 		if ( !empty( $csvID ) && !empty( $offset ) )

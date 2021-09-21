@@ -4,6 +4,9 @@ Adds an `Items` custom post_type along with an `Auction` taxonomy. Together, the
 
 ## Changelog
 
+__Version 1.8.1.1__
+- Checking if `Provenance` and `Condition` fields have content before adding to Item description.
+
 __Version 1.8.1.0__
 - Removing `StartPrice` from Item Importer.
 - Updating importer to work with Caspio CSV export.

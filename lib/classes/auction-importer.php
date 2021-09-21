@@ -493,7 +493,15 @@ class AuctionImporter extends AuctionsAndItems{
 
 		$item_title = 'Lot ' . $item['LotNumber'] . ': ' . $item['Lead'];
 		$post['post_title'] = $item_title;
-		$post['post_content'] = $item['Description'] . "\n\nPROVENANCE: " . $item['ProvenanceLine'] . "\n\nCONDITION: " . $item['Condition'];
+
+		// Build the Item description
+		$post_content = $item['Description'];
+		if( ! empty( $item['ProvenanceLine'] ) )
+			$post_content .= "\n\nPROVENANCE: " . $item['ProvenanceLine'];
+		if( ! empty( $item['Condition'] ) )
+			$post_content .= "\n\nCONDITION: " . $item['Condition'];
+		$post['post_content'] = $post_content;
+
 		$post['post_type'] = 'item';
 		$post['post_status'] = 'publish';
 		$valid_nolot_strings = array( 'no lot', 'nolot', 'no-lot' );

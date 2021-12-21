@@ -214,6 +214,25 @@ add_action( 'load-edit.php', function()
     } );
 } );
 
+/**
+ * Enhanced logging.
+ *
+ * @param      string  $message  The log message
+ */
+if( ! function_exists( 'uber_log' ) ){
+    function uber_log( $message = null ){
+      static $counter = 1;
+
+      $bt = debug_backtrace();
+      $caller = array_shift( $bt );
+
+      if( 1 == $counter )
+        error_log( "\n\n" . str_repeat('-', 25 ) . ' STARTING DEBUG [' . date('h:i:sa', current_time('timestamp') ) . '] ' . str_repeat('-', 25 ) . "\n\n" );
+      error_log( "\n" . $counter . '. ' . basename( $caller['file'] ) . '::' . $caller['line'] . "\n" . $message . "\n---\n" );
+      $counter++;
+    }
+}
+
 require_once( 'lib/classes/post_type.item.php' );
 require_once( 'lib/classes/taxonomy.auction.php' );
 

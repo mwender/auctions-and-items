@@ -142,7 +142,9 @@ class AuctionImporter extends AuctionsAndItems{
 						$post_ID = $this->import_item( $args );
 						$upload_dir = wp_upload_dir();
 						$imgdir = $upload_dir['basedir'] . '/auctions/' . $imgpath . '/';
-						$response->images = $this->get_img_from_dir( $post_ID, $item['LotNum'], $imgdir );
+
+						$lotNumber = ( array_key_exists( 'LotNum', $item ) )? $item['LotNum'] : $item['LotNumber'];
+						$response->images = $this->get_img_from_dir( $post_ID, $lotNumber, $imgdir );
 						$response->post_ID = $post_ID;
 						$response->imgdir = $imgdir;
 					}
@@ -561,6 +563,8 @@ class AuctionImporter extends AuctionsAndItems{
 			update_post_meta( $post_ID, $meta_key, $value );
 		}
 
+		if( ! array_key_exists( 'isHighLight', $item ) )
+			$item['isHighlight'] = false;
 		$highlight = boolval( $item['isHighlight'] );
 		update_post_meta( $post_ID, '_highlight', $highlight );
 

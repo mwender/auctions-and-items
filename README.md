@@ -4,10 +4,17 @@ Adds an `Items` custom post_type along with an `Auction` taxonomy. Together, the
 
 ## Changelog
 
+__Version 1.8.2__
+
+- Allowing lot number column in CSV to be named "LotNumber" in addition to "LotNum".
+- Adding `uber_log()` function for enhanced debugging.
+
 __Version 1.8.1.1__
+
 - Checking if `Provenance` and `Condition` fields have content before adding to Item description.
 
 __Version 1.8.1.0__
+
 - Removing `StartPrice` from Item Importer.
 - Updating importer to work with Caspio CSV export.
 

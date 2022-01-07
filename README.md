@@ -4,6 +4,10 @@ Adds an `Items` custom post_type along with an `Auction` taxonomy. Together, the
 
 ## Changelog
 
+__Version 1.8.3__
+
+- Updating CSV column name from `CategoryName` to `Categories`.
+
 __Version 1.8.2__
 
 - Allowing lot number column in CSV to be named "LotNumber" in addition to "LotNum".

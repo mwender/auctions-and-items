@@ -538,9 +538,9 @@ class AuctionImporter extends AuctionsAndItems{
 		}
 
 		// assign the item to any specified categories
-		if ( ! empty( $item['Categories'] ) ) {
+		if ( ! empty( $item['Categories'] ) || ! empty( $item['CategoryName'] ) ) {
 			$terms = array();
-			$item_categories = explode( ',', $item['Categories'] );
+			$item_categories = ( ! empty( $item['CategoryName'] ) )? explode( ',', $item['CategoryName'] ) : explode( ',', $item['Categories'] );
 
 			foreach ( $item_categories as $category ) {
 				if( $term = term_exists( $category, 'item_category' ) ){

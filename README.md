@@ -4,6 +4,10 @@ Adds an `Items` custom post_type along with an `Auction` taxonomy. Together, the
 
 ## Changelog
 
+__Version 1.8.4__
+
+- Accomodating `CategoryName` or `Categories` as the column heading for "Categories".
+
 __Version 1.8.3__
 
 - Updating CSV column name from `CategoryName` to `Categories`.

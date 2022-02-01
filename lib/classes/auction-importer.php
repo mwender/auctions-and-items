@@ -563,7 +563,7 @@ class AuctionImporter extends AuctionsAndItems{
 			update_post_meta( $post_ID, $meta_key, $value );
 		}
 
-		if( ! array_key_exists( 'isHighLight', $item ) )
+		if( ! array_key_exists( 'isHighlight', $item ) )
 			$item['isHighlight'] = false;
 		$highlight = boolval( $item['isHighlight'] );
 		update_post_meta( $post_ID, '_highlight', $highlight );

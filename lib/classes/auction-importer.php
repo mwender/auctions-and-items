@@ -140,6 +140,13 @@ class AuctionImporter extends AuctionsAndItems{
 							'offset' => $last_import,
 						);
 						$post_ID = $this->import_item( $args );
+
+						/**
+						 * Skip image processing if we have an ItemNumber.
+						 */
+						if( array_key_exists( 'ItemNumber', $item ) && is_numeric( $item['ItemNumber'] ) )
+							continue;
+
 						$upload_dir = wp_upload_dir();
 						$imgdir = $upload_dir['basedir'] . '/auctions/' . $imgpath . '/';
 
@@ -493,6 +500,8 @@ class AuctionImporter extends AuctionsAndItems{
 		if( empty( $item['LotNumber'] ) || ! is_numeric( $item['LotNumber'] ) )
 			return;
 
+		$itemNumber = $item['ItemNumber'];
+
 		$item_title = 'Lot ' . $item['LotNumber'] . ': ' . $item['Lead'];
 		$post['post_title'] = $item_title;
 
@@ -557,7 +566,7 @@ class AuctionImporter extends AuctionsAndItems{
 			wp_set_object_terms( $post_ID, null, 'item_category' ); // remove all categories for an item
 		}
 
-		$meta_fields = [ '_lotnum' => 'LotNumber', '_low_est' => 'LowEstimate', '_high_est' => 'HighEstimate', '_realized' => 'HammerPrice' ];
+		$meta_fields = [ '_lotnum' => 'LotNumber', '_low_est' => 'LowEstimate', '_high_est' => 'HighEstimate', '_realized' => 'HammerPrice', '_item_number' => 'ItemNumber' ];
 		foreach ( $meta_fields as $meta_key => $item_key ) {
 			$value = ( isset( $item[$item_key] ) )? $item[$item_key] : null ;
 			update_post_meta( $post_ID, $meta_key, $value );

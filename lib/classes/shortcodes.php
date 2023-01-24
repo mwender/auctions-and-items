@@ -50,6 +50,9 @@ class AuctionShortcodes extends AuctionsAndItems{
 		$image_array = wp_get_attachment_image_src( $image[0]->ID, 'medium' );
 		$image_url = $image_array[0];
 
+		if( stristr( $_SERVER['HTTP_HOST'], '.local' ) )
+			$image_url = str_replace( '.local', '.com', $image_url );
+
 		if( true == $return_url )
 			return $image_url;
 

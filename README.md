@@ -4,6 +4,11 @@ Adds an `Items` custom post_type along with an `Auction` taxonomy. Together, the
 
 ## Changelog
 
+__Version 1.8.7__
+
+- Adding `data-filter` attr to highlights table to enable filtering.
+- Loading images from `production` when viewing on `.local`.
+
 __Version 1.8.6__
 
 - BUGFIX: Auction Importer was checking for `isHighLight` (with a capital "L") instead of `isHighlight`.

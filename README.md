@@ -4,6 +4,10 @@ Adds an `Items` custom post_type along with an `Auction` taxonomy. Together, the
 
 ## Changelog
 
+__Version 1.9.0__
+
+- Adding `LotBiddingURL` option for CSV imports.
+
 __Version 1.8.7__
 
 - Adding `data-filter` attr to highlights table to enable filtering.

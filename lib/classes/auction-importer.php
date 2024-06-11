@@ -566,7 +566,7 @@ class AuctionImporter extends AuctionsAndItems{
 			wp_set_object_terms( $post_ID, null, 'item_category' ); // remove all categories for an item
 		}
 
-		$meta_fields = [ '_lotnum' => 'LotNumber', '_low_est' => 'LowEstimate', '_high_est' => 'HighEstimate', '_realized' => 'HammerPrice', '_item_number' => 'ItemNumber' ];
+		$meta_fields = [ '_lotnum' => 'LotNumber', '_low_est' => 'LowEstimate', '_high_est' => 'HighEstimate', '_realized' => 'HammerPrice', '_item_number' => 'ItemNumber', '_lot_bidding_url' => 'LotBiddingURL' ];
 		foreach ( $meta_fields as $meta_key => $item_key ) {
 			$value = ( isset( $item[$item_key] ) )? $item[$item_key] : null ;
 			update_post_meta( $post_ID, $meta_key, $value );

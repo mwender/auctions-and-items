@@ -497,94 +497,95 @@ class AuctionImporter extends AuctionsAndItems{
 			$post['ID'] = $id;
 		}
 
-		//$itemNumber = $item['ItemNumber']; // 02/13/2025 (12:30) - doesn't appear to be used, DELETE ME
-
 		$item_title = 'Lot ' . $item['lotnumber'] . ': ' . $item['lead'];
 		$post['post_title'] = $item_title;
+		$post['post_type'] = 'item';
+		$post['post_status'] = 'publish';
 
 		// Build the Item description
-		$post_content = $item['description'];
-		if( ! empty( $post_content ) ){
+		if( array_key_exists( 'description', $item ) ){
+			$post_content = $item['description'];				
+
 			if( ! empty( $item['provenanceline'] ) )
 				$post_content .= "\n\nPROVENANCE: " . $item['provenanceline'];
 			if( ! empty( $item['condition'] ) )
 				$post_content .= "\n\nCONDITION: " . $item['condition'];
 			$post['post_content'] = $post_content;			
-			
-			$post['post_type'] = 'item';
-			$post['post_status'] = 'publish';
-
-			/**
-			 * ⚠️ "NO LOT" Line Items 
-			 * 
-			 * "No Lot" in $item_title implies that we DO NOT have
-			 * a lot number for this item. However, above we are 
-			 * skipping items without a `lotnumber`. So it would appear
-			 * that the following code would never run unless we are
-			 * adding "fake" `lotnumber`s to the CSV.
-			 * 
-			 **/
-			$valid_nolot_strings = array( 'no lot', 'nolot', 'no-lot' );
-			foreach( $valid_nolot_strings as $string ){
-				if( stristr( strtolower( $item_title ), $string ) )
-					$post['post_status'] = 'draft';
-			}
-			
-			// Create the Item CPT
-			$id = wp_insert_post( $post );
-
-			// Add the Item to the Auction
-			wp_set_object_terms( $post['ID'], array( intval( $auction ) ), 'auction' );
-
-			if( ! array_key_exists( 'ID', $post ) || empty( $post['ID'] ) )
-				$post['ID'] = $id;
 		}
 
+		/**
+		 * ⚠️ "NO LOT" Line Items
+		 * 
+		 * This "No Lot" in $item_title implies to me (i.e. MWENDER) that we DO NOT have
+		 * a lot number for this item. However, above we are skipping items without a 
+		 * `lotnumber`. So it would appear that the following code would never run unless 
+		 * we are adding "fake" `lotnumber`s to the CSV. True?
+		 * 
+		 **/
+		$valid_nolot_strings = array( 'no lot', 'nolot', 'no-lot' );
+		foreach( $valid_nolot_strings as $string ){
+			if( stristr( strtolower( $item_title ), $string ) )
+				$post['post_status'] = 'draft';
+		}
+
+		// Create/Update the Item CPT
+		$id = wp_insert_post( $post );
+		if( ! array_key_exists( 'ID', $post ) || empty( $post['ID'] ) )
+			$post['ID'] = $id;
+
+		// Add the Item to the Auction
+		wp_set_object_terms( $post['ID'], array( intval( $auction ) ), 'auction' );
+
 		// assign the item to any specified tags
-		//if ( ! empty( $item['Tags'] ) ) {
-		if ( array_key_exists( '') ) {
+		if ( array_key_exists( 'tags', $item ) ) {
 			$terms = array();
 			$item_tags = explode( ',', $item['tags'] );
 
-			foreach ( $item_tags as $tag ) {
-				if( $term = term_exists( $tag, 'item_tags' ) ){
-					$terms[$term['term_id']] = $tag;
-				} else {
-					$term = wp_insert_term( $tag, 'item_tags' );
-					$terms[$term['term_id']] = $tag;
+			if( 0 < count( $item_tags ) ){
+				foreach ( $item_tags as $tag ) {
+					if( $term = term_exists( $tag, 'item_tags' ) ){
+						$terms[ $term['term_id'] ] = $tag;
+					} else {
+						$term = wp_insert_term( $tag, 'item_tags' );
+						$terms[ $term['term_id'] ] = $tag;
+					}
 				}
-			}
-			$term_ids = array_keys( $terms );
+				$term_ids = array_keys( $terms );
 
-			wp_set_object_terms( $post['ID'], $term_ids, 'item_tags' );
-		} else {
-			wp_set_object_terms( $post['ID'], null, 'item_tags' ); // remove all item_tags for an item
-		}
+				wp_set_object_terms( $post['ID'], $term_ids, 'item_tags' );				
+			} else {
+				wp_set_object_terms( $post['ID'], null, 'item_tags' ); // remove all item_tags for an item	
+			}
+		} 
 
 		// assign the item to any specified categories
-		if ( ! empty( $item['categories'] ) || ! empty( $item['categoryname'] ) ) {
+		if( array_key_exists( 'categories', $item ) || array_key_exists( 'categoryname', $item ) ){
 			$terms = array();
 			$item_categories = ( ! empty( $item['categoryname'] ) )? explode( ',', $item['categoryname'] ) : explode( ',', $item['categories'] );
 
-			foreach ( $item_categories as $category ) {
-				if( $term = term_exists( $category, 'item_category' ) ){
-					$terms[$term['term_id']] = $category;
-				} else {
-					$term = wp_insert_term( $category, 'item_category' );
-					$terms[$term['term_id']] = $category;
+			if( 0 < count( $item_categories ) ){
+				foreach ( $item_categories as $category ) {
+					if( $term = term_exists( $category, 'item_category' ) ){
+						$terms[$term['term_id']] = $category;
+					} else {
+						$term = wp_insert_term( $category, 'item_category' );
+						$terms[$term['term_id']] = $category;
+					}
 				}
-			}
-			$term_ids = array_keys( $terms );
+				$term_ids = array_keys( $terms );
 
-			wp_set_object_terms( $post['ID'], $term_ids, 'item_category' );
-		} else {
-			wp_set_object_terms( $post['ID'], null, 'item_category' ); // remove all categories for an item
+				wp_set_object_terms( $post['ID'], $term_ids, 'item_category' );				
+			} else {
+				wp_set_object_terms( $post['ID'], null, 'item_category' ); // remove all categories for an item	
+			}
 		}
 
 		$meta_fields = [ '_lotnum' => 'lotnumber', '_low_est' => 'lowestimate', '_high_est' => 'highestimate', '_realized' => 'hammerprice', '_item_number' => 'itemnumber', '_lot_bidding_url' => 'lotbiddingurl' ];
 		foreach ( $meta_fields as $meta_key => $item_key ) {
-			$value = ( isset( $item[$item_key] ) )? $item[$item_key] : null ;
-			update_post_meta( $post['ID'], $meta_key, $value );
+			if( ! array_key_exists( $item_key, $item ) )
+				continue;
+
+			update_post_meta( $post['ID'], $meta_key, $item[ $item_key ] );
 		}
 
 		if( ! array_key_exists( 'ishighlight', $item ) )
@@ -600,7 +601,7 @@ class AuctionImporter extends AuctionsAndItems{
 		 *
 		 * http://bid.igavelauctions.com/Bidding.taf?_function=detail&Auction_uid1=2872353
 		 */
-		if ( array_key_exists( 'igavellotnum', $item ) && !empty( $item['igavellotnum'] ) )
+		if ( array_key_exists( 'igavellotnum', $item ) )
 			update_post_meta( $post['ID'], '_igavel_lotnum', $item['igavellotnum'] );
 
 		/**
@@ -608,7 +609,7 @@ class AuctionImporter extends AuctionsAndItems{
 		 *
 		 * Example: http://auctions.bidsquare.com/view-auctions/catalog/id/891/lot/12362
 		 */
-		if( array_key_exists( 'bidsquarelotnum', $item ) && ! empty( $item['bidsquarelotnum'] ) )
+		if( array_key_exists( 'bidsquarelotnum', $item ) )
 			update_post_meta( $post['ID'], '_bidsquare_lotnum', $item['bidsquarelotnum'] );
 
 		/**
@@ -620,10 +621,10 @@ class AuctionImporter extends AuctionsAndItems{
 		 *
 		 * Example: http://www.liveauctioneers.com/itemLookup/170967/43
 		 */
-		if( array_key_exists( 'liveauctioneersid', $item ) && ! empty( $item['liveauctioneersid'] ) )
+		if( array_key_exists( 'liveauctioneersid', $item ) )
 			update_post_meta( $post['ID'], '_liveauctioneers_id', $item['liveauctioneersid'] );
 
-		if ( !empty( $csvID ) && !empty( $offset ) )
+		if ( ! empty( $csvID ) && ! empty( $offset ) )
 			update_post_meta( $csvID, '_last_import', $offset );
 
 		return $post['ID'];

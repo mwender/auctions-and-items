@@ -4,10 +4,10 @@
 	Plugin URI:
 	Description: Adds an `auction` taxonomy with `Item` custom post_types.
 	Author: Michael Wender
-	Version: 1.8.0
+	Version: 1.9.0
 	Author URI: http://michaelwender.com
  */
-/*  Copyright 2015-21  Michael Wender  (email : michael@michaelwender.com)
+/*  Copyright 2015-24  Michael Wender  (email : michael@michaelwender.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License, version 2, as
@@ -57,6 +57,25 @@ add_action( 'load-edit.php', function()
             do_action( 'aai_empty_trash', $post_id );
     } );
 } );
+
+/**
+ * Enhanced logging.
+ *
+ * @param      string  $message  The log message
+ */
+if( ! function_exists( 'uber_log' ) ){
+    function uber_log( $message = null ){
+      static $counter = 1;
+
+      $bt = debug_backtrace();
+      $caller = array_shift( $bt );
+
+      if( 1 == $counter )
+        error_log( "\n\n" . str_repeat('-', 25 ) . ' STARTING DEBUG [' . date('h:i:sa', current_time('timestamp') ) . '] ' . str_repeat('-', 25 ) . "\n\n" );
+      error_log( "\n" . $counter . '. ' . basename( $caller['file'] ) . '::' . $caller['line'] . "\n" . $message . "\n---\n" );
+      $counter++;
+    }
+}
 
 require_once( 'lib/classes/post_type.item.php' );
 require_once( 'lib/classes/taxonomy.auction.php' );

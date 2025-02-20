@@ -328,6 +328,8 @@ class AuctionTaxonomy extends AuctionsAndItems{
     /**
      * Adds additional options to `auctions` custom taxonomy
      *
+     * DEPRECATED: These options are now handled by ACF fields.
+     *
      * @since 1.0.0
      *
      * @return void

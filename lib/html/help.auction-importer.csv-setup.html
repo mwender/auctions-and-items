@@ -1,58 +1,65 @@
 <h3>CSV Setup</h3>
-<p>Setup your CSV with the following columns: <code>LotNum</code>, <code>Title</code>, <code>Description</code>, <code>LowEst</code>, <code>HighEst</code>, <code>Realized</code>, <code>Highlight</code>, <code>Categories</code>, <code>Tags</code>, <code>iGavelLotNum</code>, <code>BidsquareLotNum</code>, and <code>LiveAuctioneersID</code>. Here's an example:</p>
 
-<table class="widefat">
-	<thead>
-		<tr class="alternate">
-			<th>LotNum</th>
-			<th>Title</th>
-			<th>Description</th>
-			<th>LowEst</th>
-			<th>HighEst</th>
-			<th>Realized</th>
-			<th>Highlight</th>
-			<th>Categories</th>
-			<th>Tags</th>
-			<th>iGavelLotNum</th>
-			<th>BidsquareLotNum</th>
-			<th>LiveAuctioneersID</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr>
-			<td>1</td>
-			<td>Lot 1: 3 Chinese Snuff Bottles inc. Cicada</td>
-			<td>1st item: Chinese bronze cicada from snuff bottle with...</td>
-			<td>500</td>
-			<td>600</td>
-			<td>324.50</td>
-			<td></td>
-			<td>Chinese</td>
-			<td>bronze,bottles</td>
-			<td></td>
-			<td></td>
-			<td></td>
-		</tr>
-		<tr class="alternate">
-			<td>2</td>
-			<td>Lot: 2 Chinese Archaic Bronze Censer, Jade Final</td>
-			<td>Chinese Archaic Bronze Censer or Ding, likely Zhou Dyn...</td>
-			<td>900</td>
-			<td>1100</td>
-			<td>20650</td>
-			<td>true</td>
-			<td>Chinese</td>
-			<td>jade,bronze</td>
-			<td></td>
-			<td></td>
-			<td></td>
-		</tr>
-	</tbody>
-</table>
-
-<h4>Notes</h4>
+<p><span style="background-color: #ffed56; padding: 4px;"><strong>UPDATE (09/20/2021):</strong> The auction importer now works with the raw CSV exported from Caspio. No need to manipulate the file, the import now handles the following:</span></p>
 <ul>
-	<li>When exporting a spreadsheet from Excel, choose "Windows Comma Separated (.csv)" as the file format.</li>
-	<li><strong>iGavel Online Auctions:</strong> Add a link to any item's corresponding iGavel auction page by adding column called <code>iGavelLotNum</code> (<em>case-sensitive</em>) to your CSV.</li>
-	<li><code>LiveAuctioneersID</code> - we're able to specify the Live Auctioneers auction ID at the Item level to allow for mutliday auctions which have multiple Live Auctioneers IDs.</li>
+<li>Creates the <strong>Item Title</strong> by concatenating the <code>LotNumber</code> and <code>Lead</code> columns (i.e. <code>`Lot ${LotNumber}: ${Lead}`</code>).</li>
+<li>Builds the <strong>Item Description</strong> by concatenating the item <code>Description</code>, <code>ProvenanceLine</code>, and <code>Condition</code> columns (i.e. <code>`${Description}\n\nPROVENANCE: ${ProvenanceLine}\n\nCONDITION: ${Condition}`</code>).</li>
 </ul>
+
+<h4>CSV Columns (revised 06/11/2024)</h4>
+<div>
+	<p><strong>Required columns</strong>: <code>LotNumber</code>, <code>Lead</code>, <code>Description</code>, <code>LowEstimate</code>, <code>HighEstimate</code>, <code>ProvenanceLine</code>, <code>Condition</code>, <code>CategoryName</code> and <code>Tags</code>.</p>
+	<p><em>Optional</em> columns: <code>LotBiddingURL</code>, <code>LiveAuctioneersID</code>, <code>HammerPrice</code>, <code>isHighlight</code>, and <code>iGavelLotNum</code> </p>
+	<p>Here's an example:</p>
+
+	<table class="widefat">
+		<thead>
+			<tr class="alternate">
+				<th>LotNumber</th>
+				<th>Lead</th>
+				<th>Description</th>
+				<th>LowEstimate</th>
+				<th>HighEstimate</th>
+				<th>ProvenanceLine</th>
+				<th>Condition</th>
+				<th>CategoryName</th>
+				<th>Tags</th>
+				<th>LiveAuctioneersID</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>1</td>
+				<td>Chinese Snuff Bottles inc. Cicada</td>
+				<td>Chinese bronze cicada from snuff bottle with...</td>
+				<td>500</td>
+				<td>600</td>
+				<td>See description for provenance.</td>
+				<td>Overall good condition</td>
+				<td>Asian</td>
+				<td>bronze,bottles</td>
+				<td>230967</td>
+			</tr>
+			<tr class="alternate">
+				<td>2</td>
+				<td>Chinese Archaic Bronze Censer, Jade Final</td>
+				<td>Chinese Archaic Bronze Censer or Ding, likely Zhou Dyn...</td>
+				<td>450</td>
+				<td>550</td>
+				<td>See description for provenance.</td>
+				<td>Overall good condition</td>
+				<td>Asian</td>
+				<td>bronze,bottles</td>
+				<td>230968</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<h4>Notes</h4>
+	<ul>
+		<li><strong>iGavel Online Auctions:</strong> Add a link to any item's corresponding iGavel auction page by adding column called <code>iGavelLotNum</code> (<em>case-sensitive</em>) to your CSV.</li>
+		<li><code>LiveAuctioneersID</code> - we're able to specify the Live Auctioneers auction ID at the Item level to allow for mutliday auctions which have multiple Live Auctioneers IDs.</li>
+		<li>You may also use <code>HammerPrice</code> and <code>isHighlight</code> columns for post auction imports/updates.</li>
+	</ul>
+
+</div>

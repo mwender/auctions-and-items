@@ -15,13 +15,36 @@ Adds an `Items` CPT along with an `Auction` taxonomy. Together, these provide th
 
 This plugin supports the display of large, multi-item auctions. Each Item post features a gallery of high-resolution images allowing site visitors to easily view and assess auction items.
 
-
 == Changelog ==
+
+= 1.9.0 =
+* Adding `LotBiddingURL` option for CSV imports.
+
+= 1.8.7 =
+* Adding `data-filter` attr to highlights table to enable filtering.* Loading images from `production` when viewing on `.local`.
+
+= 1.8.6 =
+* BUGFIX: Auction Importer was checking for `isHighLight` (with a capital "L") instead of `isHighlight`.
+
+= 1.8.5 =
+* Updating importer's docs.
+
+= 1.8.4 =
+* Accomodating `CategoryName` or `Categories` as the column heading for "Categories".
+
+= 1.8.3 =
+* Updating CSV column name from `CategoryName` to `Categories`.
 
 = 1.8.2 =
 * Updating CSS pre-processor to SCSS, moving build process to NPM.
 * Building README via `grunt readme`.
 * Adding auction viewer overlay logo.
+
+= 1.8.1.1 =
+* Checking if `Provenance` and `Condition` fields have content before adding to Item description.
+
+= 1.8.1.0 =
+* Removing `StartPrice` from Item Importer.* Updating importer to work with Caspio CSV export.
 
 = 1.8.1 =
 * Removing Genesis Theme dependency when retrieving first attachment image for an Auction Item.

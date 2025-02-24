@@ -84,7 +84,7 @@ class AuctionImporter extends AuctionsAndItems{
 						$data['csv'][$x]['last_import'] = get_post_meta( $file->ID, '_last_import', true );
 						if ( empty( $data['csv'][$x]['last_import'] ) )
 							$data['csv'][$x]['last_import'] = 0;
-						$args = array( 'taxonomy'=>'auction', 'name'=>'auction-'.$file->ID, 'id'=>'auction-'.$file->ID, 'echo'=>false, 'hierarchical'=>true, 'orderby'=>'name', 'hide_empty'=>false, 'selected'=>get_post_meta( $file->ID, '_auction', true ), 'show_option_none'=>'Select an auction...' );
+						$args = array( 'taxonomy' => 'auction', 'name' => 'auction-'.$file->ID, 'id' => 'auction-'.$file->ID, 'echo'=>false, 'hierarchical'=>true, 'orderby' => 'name', 'hide_empty' => false, 'selected' => get_post_meta( $file->ID, '_auction', true ), 'show_option_none' => 'Select an auction...' );
 						$auction_cats = wp_dropdown_categories( $args );
 						$auction_cats = preg_replace( "#<select([^>]*)>#", "<select$1 onchange=\"updateCSVAuction($file->ID, this.options[this.selectedIndex].value);\">", $auction_cats );
 						$data['csv'][$x]['auction'] = $auction_cats;

@@ -694,7 +694,22 @@ class AuctionImporter extends AuctionsAndItems{
 	}
 
 	/**
-	 * Opens a CSV file, populates an array, and returns said array
+	 * Opens a CSV file, processes its contents, and stores the data in a transient.
+	 *
+	 * This method reads a CSV file, extracting its column headers and rows. If the CSV data is
+	 * already stored in a transient (identified by `$csvID`), it retrieves the cached data instead
+	 * of reprocessing the file.
+	 *
+	 * @param string $csvfile Path to the CSV file.
+	 * @param string|null $csvID Unique identifier for storing/retrieving the transient data.
+	 * @return array Processed CSV data, including an error message if no CSV file is specified.
+	 *
+	 * @structure array $csv The processed CSV data stored in the transient:
+	 *     - `row_count` (int) The number of data rows in the CSV.
+	 *     - `column_count` (int) The number of columns in the CSV.
+	 *     - `columns` (array) An indexed array of column headers.
+	 *     - `rows` (array) A multidimensional array containing CSV row data.
+	 *     - `error` (string) An error message if no CSV is specified.
 	 */
 	public function open_csv( $csvfile = '', $csvID = null ) {
 		if( empty( $csvfile ) )

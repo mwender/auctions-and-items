@@ -1,0 +1,230 @@
+@use "colors";
+
+// Variables
+
+$colorRed: #fa3031;
+$colorPurple: #932ab6;
+$colorGreen: #43c83c;
+$colorBlue: #1171a3;
+$colorLightBlue: #52b9e9;
+$colorGrey: #444;
+$colorLightest: #efefef;
+$colorStriping: #F7F7F7;
+$colorLight: #eee;
+$colorLightGrey: #ddd;
+$colorBlack: #000;
+$colorWhite: #fff;
+$fontDefault: 'Lato', sans-serif;
+
+
+// Mixins
+
+@mixin metroTheme($color) {
+  border-color: $color;
+
+  > tfoot > tr,
+  > thead > tr {
+    > th,
+    > td {
+      background-color: $color;
+      border-color: $color;
+    }
+  }
+}
+
+@mixin borderRadius($radius) {
+  -moz-border-radius: $radius;
+  -webkit-border-radius: $radius;
+  border-radius: $radius;
+}
+
+
+// Classes
+
+.footable {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  border: 3px solid $colorLightBlue;
+  font-family: $fontDefault;
+  color: $colorGrey;
+  background: $colorLightest;
+  @include borderRadius(0);
+
+  &.breakpoint > tbody > tr {
+    &.footable-row-detail {
+        background: $colorLight;
+    }
+
+    &:hover:not(.footable-row-detail) {
+      cursor: pointer;
+    }
+
+    > td.footable-row-detail-cell {
+      background:#fff;
+    }
+  }
+
+  > tbody {
+    img {
+      vertical-align: middle;
+    }
+
+    > tr {
+      &:hover:not(.footable-row-detail) {
+        background: $colorLightGrey;
+
+        > td {
+          color: $colorBlack;
+        }
+      }
+
+      &:last-child > td {
+          border-bottom: none;
+      }
+
+      > td {
+        border-top: 1px solid $colorLightGrey;
+        padding: 10px;
+        text-align: left;
+        border-left: none;
+
+        &.footable-row-detail-cell,
+        &.footable-first-column {
+          border-left: none;
+        }
+      }
+    }
+  }
+
+  > thead > tr {
+    > th {
+      border-bottom: 1px solid $colorLightGrey;
+      padding: 10px;
+      text-align: left;
+    }
+
+    > th,
+    > td {
+      background-color: $colorLightBlue;
+      border: 1px solid $colorLightBlue;
+      color: $colorWhite;
+      border-top: none;
+      border-left: none;
+      font-weight: normal;
+
+      &.footable-first-column {
+        border-left: none;
+      }
+    }
+  }
+
+  > tfoot {
+    > tr {
+      > th,
+      > td {
+        background-color: $colorLightBlue;
+        border: 1px solid $colorLightBlue;
+        color: $colorWhite;
+        border-top: none;
+        border-left: none;
+        padding: 5px;
+      }
+    }
+  }
+
+  // PAGINATION
+  > tfoot .pagination,
+  > thead .pagination {
+    text-align: center;
+    ul {
+      display: inline-block;
+      -webkit-box-shadow: none;
+      -moz-box-shadow: none;
+      box-shadow: none;
+      vertical-align: middle;
+      margin: 0;
+      padding: 0;
+      > li {
+        display: inline;
+        > a,
+        > span{
+          float: left;
+          border: 2px solid transparent;
+          margin: 0 3px;
+          color: $colorWhite;
+          background: transparent;
+          padding:1px 5px;
+          text-decoration: none;
+        }
+
+        &.disabled > a {
+          color:#888;
+        }
+
+        &.active > a {
+          border-color: $colorWhite;
+        }
+
+        &:first-child,
+        &:last-child {
+          > a,
+          > span {
+            @include borderRadius(0);
+          }
+        }
+      }
+    }
+  }
+
+  > thead .th-pagination{
+    padding: 10px 0 0 0;
+
+    .pagination{
+      margin: 0;
+    }
+  }
+
+  //Metro Themes
+
+  &.metro-red {
+    @include metroTheme($colorRed);
+  }
+  &.metro-purple {
+    @include metroTheme($colorPurple);
+  }
+  &.metro-green {
+    @include metroTheme($colorGreen);
+  }
+  &.metro-blue {
+    @include metroTheme($colorBlue);
+  }
+  &.metro-centric-red {
+    @include metroTheme(colors.$centric-red);
+  }
+}
+
+.footable-odd{
+	background-color: $colorStriping;
+}
+
+.search-highlights{
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 24px;
+
+  &,
+  input{
+    font-size: 24px;
+  }
+  input{
+    width: 400px;
+  }
+}
+
+.footable-row-detail-row{
+  .footable-row-detail-name,
+  .footable-row-detail-value{
+    display: block;
+  }
+}

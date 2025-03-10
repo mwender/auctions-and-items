@@ -1,6 +1,39 @@
 <?php
 
 namespace AuctionsAndItems\utilities;
+use function AuctionsAndItems\handlebars\{render_template};
+
+/**
+ * Returns an HTML alert.
+ *
+ * @param      array   $atts {
+ *   Optional. An array of arguments.
+ *
+ *   @type      string  $type     The alert type (can be: primary, secondary, success, danger, warning, info, light, dark)
+ *   @type      string  $heading  The alert heading
+ *   @type      string  $message  The alert message
+ * }
+ *
+ * @return     string  The alert HTML.
+ */
+function get_alert( $atts = [] ){
+  $args = shortcode_atts( [
+    'type' => 'primary',
+    'heading' => false,
+    'message' => '...',
+  ], $atts );
+
+  $available_types = [ 'primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark' ];
+  $type = ( in_array( $args['type'], $available_types ) )? $args['type'] : 'primary' ;
+  $data = [
+    'type'    => $type,
+    'heading' => $args['heading'],
+    'message' => $args['message'],
+  ];
+  $html = render_template( 'alert', $data );
+
+  return $html;
+}
 
 /**
  * Formats a number in USD.

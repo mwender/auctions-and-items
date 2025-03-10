@@ -8,11 +8,13 @@
 }
 .alert .alert-message {
   flex: 1;
+  text-align: left;
 }
 .alert .alert-heading {
   font-size: 1.25rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
+  margin-top: 0;
 }
 .alert-primary {
   background-color: #cfe2ff;

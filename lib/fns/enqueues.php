@@ -56,6 +56,16 @@ function enqueue_scripts(){
 add_action( 'wp_enqueue_scripts', __NAMESPACE__ . '\\enqueue_scripts', 10 );
 
 /**
+ * Enqueue admin styles.
+ *
+ * @since 1.0.0
+ */
+function admin_enqueue_scripts(){
+  wp_enqueue_style( 'auctions-and-items', AAI_PLUGIN_URL . '/lib/' . AAI_CSS_DIR . '/admin.css', null, filemtime( AAI_PLUGIN_URL . '/lib/' . AAI_CSS_DIR . '/admin.css' ) );
+}
+add_action( 'admin_enqueue_scripts', __NAMESPACE__ . '\\admin_enqueue_scripts' );
+
+/**
  * Registers scripts.
  *
  * @since 1.x.x

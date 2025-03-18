@@ -1,4 +1,6 @@
 <?php
+use function AuctionsAndItems\utilities\{get_alert};
+
 class AuctionImporter extends AuctionsAndItems{
 
     private static $instance = null;
@@ -115,8 +117,20 @@ class AuctionImporter extends AuctionsAndItems{
 					// Get the folder where this auction's images are stored
 					$imgpath = get_post_meta( $id, '_image_folder', true );
 
-					// Open this CSV
 					$csvfile = str_replace( get_bloginfo( 'url' ) . '/', ABSPATH, $url );
+
+				  /*
+					 * Open this CSV
+					 *
+					 * open_csv() returns: 
+					 *
+					 * @structure array $csv The processed CSV data stored in the transient:
+					 *     - `row_count` (int) The number of data rows in the CSV.
+					 *     - `column_count` (int) The number of columns in the CSV.
+					 *     - `columns` (array) An indexed array of column headers.
+					 *     - `rows` (array) A multidimensional array containing CSV row data.
+					 *     - `error` (string) An error message if no CSV is specified.
+					 */
 					$csv = $this->open_csv( $csvfile, $id );
 					$response->total_rows = count( $csv['rows'] );
 					$csv['rows'] = array_slice( $csv['rows'], $offset, $limit );
@@ -132,6 +146,29 @@ class AuctionImporter extends AuctionsAndItems{
 						}
 						$last_import = $offset + $limit;
 
+						/**
+						 * FOR NEXT TIME:
+						 * 
+						 * 03/10/2025 (17:05) - Continue working on below to-dos:
+						 * 
+						 * TODO:
+						 * - Update previous code to require `itemNumber` column in the import CSV.
+						 *   - [x] Update Import Auction preview to display ItemNumber.
+						 *   - [x] Throw an error if no `ItemNumber`.
+						 *   - [x] Handle error in import-csv.js if no `ItemNumber`.
+						 *   - [x] Add admin CSS with styling for .alert.alert-warning
+						 *   - [x] Allow editing "Item Number"
+						 *   - [x] Include "Item Number" in admin listing.
+						 *   - [ ] Add `hammerprice`.
+						 *   - [ ] `hammerprice` to become `realizedprice`
+						 *   - [ ] Update how online bidding URLs work. Just use LotBiddingURL
+						 *   - [ ] Allow editing "Lot Bidding URL".
+						 * 
+						 * - Update following code to work with the new required `itemNumber` field.
+						 *   - We don't need to skip image processing below if `itemNumber` is present.
+						 *   - Perhaps we skip image processing when the auction item already exists?
+						 */
+
 						$args = array(
 							'item' => $item,
 							'auction' => $auction,
@@ -140,6 +177,11 @@ class AuctionImporter extends AuctionsAndItems{
 							'offset' => $last_import,
 						);
 						$post_ID = $this->import_item( $args );
+						if( is_wp_error( $post_ID ) ){
+							wp_send_json_error([
+								'message' => $post_ID->get_error_message(),
+							], 400 );
+						}
 
 						/**
 						 * Skip image processing if we have an ItemNumber.
@@ -177,7 +219,7 @@ class AuctionImporter extends AuctionsAndItems{
 					$data['filename'] = basename( $url );
 					$csvfile = str_replace( get_bloginfo( 'url' ). '/', ABSPATH, $url );
 					$data['filepath'] = $csvfile;
-					$data['csv'] = $this->open_csv( $csvfile, $id );
+					$data['csv'] = $this->open_csv( $csvfile, $id, false );
 					$data['imgpath'] = get_post_meta( $id, '_image_folder', true );
 					if ( $auction_id = get_post_meta( $id, '_auction', true ) ) {
 						if ( $term = get_term( $auction_id, 'auction' ) ) {
@@ -313,11 +355,11 @@ class AuctionImporter extends AuctionsAndItems{
 	 */
 	private function auction_object_exists( $args ){
 		$defaults = array(
-			'exists' => 'item',
-			'lotnum' => null,
-			'auction_slug' => null,
-			'post_parent' => null,
-			'post_title' => null,
+			'exists' 		=> 'item',
+			'itemnumber' 	=> null,
+			'auction_slug' 	=> null,
+			'post_parent' 	=> null,
+			'post_title' 	=> null,
 		);
 
 		$args = wp_parse_args( $args, $defaults );
@@ -330,12 +372,21 @@ class AuctionImporter extends AuctionsAndItems{
 			break;
 
 			case 'item':
+				/**
+				 * 03/10/2025 (15:06) - Previously we were also checking 
+				 * `taxonomy=auction` and`term={$args['auction_slug']}. 
+				 * Now that we are treating `ItemNumber` as a unique
+				 * key, we are checking for _item_number only.
+				 *
+				 *	- 'taxonomy' => 'auction',
+				 *	- 'term' => $args['auction_slug'],
+				 * 
+				 * @var array
+				 */
 				$get_posts_args = array(
-					'meta_value' => $args['lotnum'],
-					'meta_key' => '_lotnum',
+					'meta_value' => $args['itemnumber'],
+					'meta_key' => '_item_number',
 					'post_type' => 'item',
-					'taxonomy' => 'auction',
-					'term' => $args['auction_slug'],
 				);
 
 				$items = get_posts( $get_posts_args );
@@ -500,14 +551,22 @@ class AuctionImporter extends AuctionsAndItems{
 		$args = wp_parse_args( $args, $defaults );
 		extract( $args );
 
+		// Check for `itemnumber`
+		if( empty( $item['itemnumber'] ) ){
+			$alert = get_alert([ 
+				'type' => 'warning',
+				'message' => '<strong>ERROR:</strong> ItemNumber is missing. Please ensure your CSV has an <code>ItemNumber</code> assigned to each auction item.'
+			]);
+			return new WP_Error( 'no-itemnumber', $alert );
+		}
+
 		// Skip items with empty or non-numeric Lot Numbers:
 		if( empty( $item['lotnumber'] ) || ! is_numeric( $item['lotnumber'] ) )
 			return;
 
 		// if this item exists, add the ID to the query so that it gets updated
-		if ( $id = $this->auction_object_exists( array( 'exists' => 'item', 'lotnum' => $item['lotnumber'], 'auction_slug' => $auction_slug ) ) ) {
+		if( $id = $this->auction_object_exists([ 'exists' => 'item', 'itemnumber' => $item['itemnumber'] ]) )
 			$post['ID'] = $id;
-		}
 
 		$item_title = 'Lot ' . $item['lotnumber'] . ': ' . $item['lead'];
 		$post['post_title'] = $item_title;
@@ -710,12 +769,12 @@ class AuctionImporter extends AuctionsAndItems{
 	 *     - `columns` (array) An indexed array of column headers.
 	 *     - `rows` (array) A multidimensional array containing CSV row data.
 	 *     - `error` (string) An error message if no CSV is specified.
-	 */
-	public function open_csv( $csvfile = '', $csvID = null ) {
+	 */	
+	public function open_csv( $csvfile = '', $csvID = null, $cached = true ) {
 		if( empty( $csvfile ) )
 			return $csv['error'] = 'No CSV specified!';
 
-		if( false === ( $csv = get_transient( 'csv_' . $csvID ) ) ) {
+		if( false == $cached || false === ( $csv = get_transient( 'csv_' . $csvID ) ) ) {
 			$csv = array( 'row_count' => 0, 'column_count' => 0, 'columns' => array(), 'rows' => array() );
 			if ( !empty( $csvfile ) && file_exists( $csvfile ) ) {
 				if ( ( $handle = @fopen( $csvfile, 'r' ) ) !== false ) {

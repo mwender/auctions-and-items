@@ -1,0 +1,35 @@
+/* Admin Tables */
+body.post-type-item .wp-list-table{
+	th#item_number{
+		width: 60px;
+	}
+	td.item_number{
+		text-align: right;
+	}
+	th#title{
+
+	}	
+	th#auction{
+
+	}	
+	th#item_categories{
+
+	}	
+	th#item_tags{
+
+	}					
+	th#realized{
+		width: 80px;
+	}		
+	th#date{
+
+	}		
+	th#wpsite-show-ids{
+
+	}
+}
+table.item-options.table-striped{
+	tr:nth-child(odd){
+		background-color: #eee;
+	}
+}

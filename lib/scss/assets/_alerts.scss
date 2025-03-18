@@ -8,12 +8,14 @@
 
   .alert-message {
     flex: 1;
+    text-align: left;
   }
 
   .alert-heading {
     font-size: 1.25rem;
     font-weight: 600;
     margin-bottom: 0.5rem;
+    margin-top: 0;
   }
 
   // Alert Variants

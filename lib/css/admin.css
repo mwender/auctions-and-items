@@ -1,3 +1,17 @@
+/* Admin Tables */
+body.post-type-item .wp-list-table th#item_number {
+  width: 60px;
+}
+body.post-type-item .wp-list-table td.item_number {
+  text-align: right;
+}
+body.post-type-item .wp-list-table th#realized {
+  width: 80px;
+}
+table.item-options.table-striped tr:nth-child(odd) {
+  background-color: #eee;
+}
+
 .alert {
   padding: 1rem;
   border-radius: 0.375rem;

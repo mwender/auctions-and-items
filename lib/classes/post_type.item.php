@@ -171,6 +171,11 @@ class AuctionItem extends AuctionsAndItems{
                 echo $post_id;
                 break;
 
+            case 'item_number':
+              $item_number = get_post_meta( $post_id, '_item_number', true );
+              echo $item_number;
+              break;
+
             case 'auction':
                 $auctions = get_the_terms( $post_id, 'auction' );
                 if ( !empty( $auctions ) ) {
@@ -241,6 +246,7 @@ class AuctionItem extends AuctionsAndItems{
     public function columns_for_items( $defaults ){
         $defaults = array(
             'cb' => '<input type="checkbox" />',
+            'item_number' => 'Item No.',
             'title' => 'Item',
             'auction' => 'Auctions',
             'item_categories' => 'Categories',
@@ -310,7 +316,9 @@ class AuctionItem extends AuctionsAndItems{
      */
     public function metabox_for_item(){
         global $post;
+        $item_number = get_post_meta( $post->ID, '_item_number', true );
         $lotnum = get_post_meta( $post->ID, '_lotnum', true );
+        $lot_bidding_url = get_post_meta( $post->ID, '_lot_bidding_url', true );
         $low_est = get_post_meta( $post->ID, '_low_est', true );
         $high_est = get_post_meta( $post->ID, '_high_est', true );
         $start_price = get_post_meta( $post->ID, '_start_price', true );
@@ -319,31 +327,45 @@ class AuctionItem extends AuctionsAndItems{
         $item_redirect = get_post_meta( $post->ID, '_item_redirect', true );
     ?>
         <input type="hidden" id="item_options" name="item_options" value="true" />
-    <table class="form-table table-striped">
+    <table class="form-table item-options table-striped">
         <colgroup><col width="20%" /><col width="60%" /><col width="20%" /></colgroup>
-        <tr style="background-color: #eee;">
+        <tr>
+            <th scope="row" style="padding-left: 8px;"><strong>Item Number</strong></th>
+            <td><label for="lotnum"><input id="item_number" type="number" style="width: 160px; text-align: right" name="item_number" value="<?php echo $item_number ?>" /></label></td>
+            <td><code>_item_number</code></td>
+        </tr>
+        <tr>
             <th scope="row" style="padding-left: 8px;"><strong>Lot Number</strong></th>
-            <td><label for="lotnum"><input id="lotnum" type="text" style="width: 80px; text-align: right" name="lotnum" value="<?php echo $lotnum ?>" /></label></td>
+            <td><label for="lotnum"><input id="lotnum" type="number" style="width: 160px; text-align: right" name="lotnum" value="<?php echo $lotnum ?>" /></label></td>
             <td><code>_lotnum</code></td>
         </tr>
-        <tr class="odd">
+        <tr>
+            <th scope="row" style="padding-left: 8px;"><strong>Lot Bidding URL</strong></th>
+            <td>
+              <label for="lotbiddingurl"><input id="lotbiddingurl" type="text" style="width: 80%; text-align: left; margin-bottom: .5em" placeholder="https://" name="lot_bidding_url" value="<?php echo $lot_bidding_url ?>" /></label>
+              <br>
+              Include the full URL (with the <code>https://</code>) to the external bidding page.
+            </td>
+            <td><code>_lot_bidding_url</code></td>
+        </tr>        
+        <tr>
             <th scope="row" style="padding-left: 8px;"><strong>Low Estimate</strong></th>
-            <td><label for="low_est"><input id="low_est" type="text" style="width: 100px; text-align: right" name="low_est" value="<?php echo $low_est ?>" /></label></td>
+            <td><label for="low_est"><input id="low_est" type="number" style="width: 160px; text-align: right" name="low_est" value="<?php echo $low_est ?>" /></label></td>
             <td><code>_low_est</code></td>
         </tr>
-        <tr style="background-color: #eee;">
+        <tr>
             <th scope="row" style="padding-left: 8px;"><strong>High Estimate</strong></th>
-            <td><label for="high_est"><input id="high_est" type="text" style="width: 100px; text-align: right" name="high_est" value="<?php echo $high_est ?>" /></label></td>
+            <td><label for="high_est"><input id="high_est" type="number" style="width: 160px; text-align: right" name="high_est" value="<?php echo $high_est ?>" /></label></td>
             <td><code>_high_est</code></td>
         </tr>
         <tr>
             <th scope="row" style="padding-left: 8px;"><strong>Start Price</strong></th>
-            <td><label for="start_price"><input id="start_price" type="text" style="width: 100px; text-align: right" name="start_price" value="<?php echo $start_price ?>" /></label></td>
+            <td><label for="start_price"><input id="start_price" type="number" style="width: 160px; text-align: right" name="start_price" value="<?php echo $start_price ?>" /></label></td>
             <td><code>_start_price</code></td>
         </tr>
-        <tr style="background-color: #eee;">
+        <tr>
             <th scope="row" style="padding-left: 8px;"><strong>Realized Price</strong></th>
-            <td><label for="realized"><input id="realized" type="text" style="width: 100px; text-align: right" name="realized" value="<?php echo $realized ?>" /></label></td>
+            <td><label for="realized"><input id="realized" type="number" style="width: 160px; text-align: right" name="realized" value="<?php echo $realized ?>" /></label></td>
             <td><code>_realized</code></td>
         </tr>
         <tr>
@@ -351,7 +373,7 @@ class AuctionItem extends AuctionsAndItems{
             <td><label for="highlight"><input type="checkbox" name="highlight" id="highlight" value="1"<?php if ( $highlight == true ) echo ' checked="checked"' ?> />Display this item in this auction's highlights.</label></td>
             <td><code>_highlight</code></td>
         </tr>
-        <tr style="background-color: #eee;">
+        <tr>
             <th scope="row" style="padding-left: 8px;"><strong>Sub-Auction Redirect</strong></th>
             <td><label for="redirect"><?php
             $args = array();
@@ -390,7 +412,7 @@ class AuctionItem extends AuctionsAndItems{
         if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE )
             return $post_id;
 
-        $valid_fields = array( '_lotnum' => '', '_low_est' => '', '_high_est' => '', '_start_price' => '', '_realized' => '', '_highlight' => false, '_item_redirect' => 0 );
+        $valid_fields = array( '_lotnum' => '', '_low_est' => '', '_high_est' => '', '_start_price' => '', '_realized' => '', '_highlight' => false, '_item_redirect' => 0, '_item_number' => '', '_lot_bidding_url' => '' );
         foreach ( $valid_fields as $field => $default ) {
 
             $post_field = substr( $field, 1 );

@@ -322,6 +322,7 @@ class AuctionItem extends AuctionsAndItems{
         $low_est = get_post_meta( $post->ID, '_low_est', true );
         $high_est = get_post_meta( $post->ID, '_high_est', true );
         $start_price = get_post_meta( $post->ID, '_start_price', true );
+        $hammerprice = get_post_meta( $post->ID, '_hammerprice', true );
         $realized = get_post_meta( $post->ID, '_realized', true );
         $highlight = get_post_meta( $post->ID, '_highlight', true );
         $item_redirect = get_post_meta( $post->ID, '_item_redirect', true );
@@ -362,6 +363,11 @@ class AuctionItem extends AuctionsAndItems{
             <th scope="row" style="padding-left: 8px;"><strong>Start Price</strong></th>
             <td><label for="start_price"><input id="start_price" type="number" style="width: 160px; text-align: right" name="start_price" value="<?php echo $start_price ?>" /></label></td>
             <td><code>_start_price</code></td>
+        </tr>
+        <tr>
+            <th scope="row" style="padding-left: 8px;"><strong>Hammer Price</strong></th>
+            <td><label for="realized"><input id="realized" type="number" style="width: 160px; text-align: right" name="hammerprice" value="<?php echo $hammerprice ?>" /></label></td>
+            <td><code>_hammerprice</code></td>
         </tr>
         <tr>
             <th scope="row" style="padding-left: 8px;"><strong>Realized Price</strong></th>
@@ -412,7 +418,7 @@ class AuctionItem extends AuctionsAndItems{
         if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE )
             return $post_id;
 
-        $valid_fields = array( '_lotnum' => '', '_low_est' => '', '_high_est' => '', '_start_price' => '', '_realized' => '', '_highlight' => false, '_item_redirect' => 0, '_item_number' => '', '_lot_bidding_url' => '' );
+        $valid_fields = array( '_lotnum' => '', '_low_est' => '', '_high_est' => '', '_start_price' => '', '_hammerprice' => '', '_realized' => '', '_highlight' => false, '_item_redirect' => 0, '_item_number' => '', '_lot_bidding_url' => '' );
         foreach ( $valid_fields as $field => $default ) {
 
             $post_field = substr( $field, 1 );

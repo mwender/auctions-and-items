@@ -651,7 +651,15 @@ class AuctionImporter extends AuctionsAndItems{
 			}
 		}
 
-		$meta_fields = [ '_lotnum' => 'lotnumber', '_low_est' => 'lowestimate', '_high_est' => 'highestimate', '_realized' => 'hammerprice', '_item_number' => 'itemnumber', '_lot_bidding_url' => 'lotbiddingurl' ];
+		$meta_fields = [ 
+			'_lotnum' 					=> 'lotnumber',
+			'_low_est' 					=> 'lowestimate',
+			'_high_est' 				=> 'highestimate',
+			'_realized' 				=> 'realized',
+			'_hammerprice'			=> 'hammerprice',
+			'_item_number' 			=> 'itemnumber',
+			'_lot_bidding_url' 	=> 'lotbiddingurl',
+		];
 		foreach ( $meta_fields as $meta_key => $item_key ) {
 			if( ! array_key_exists( $item_key, $item ) )
 				continue;

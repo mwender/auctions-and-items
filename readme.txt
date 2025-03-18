@@ -22,6 +22,7 @@ This plugin supports the display of large, multi-item auctions. Each Item post f
 	* Refactoring import to ignore missing columns. If a column is missing when updating an auction item, no processing is performed for that particular column.
 	* The importer now treats columns in a case-insensitive fashion.
 	* Adding "Item No." as a unique key for auction items.
+* Adding "Hammer Price" as Item CPT meta.
 
 = 1.9.0 =
 * Adding `LotBiddingURL` option for CSV imports.

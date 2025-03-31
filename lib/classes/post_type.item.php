@@ -328,6 +328,7 @@ class AuctionItem extends AuctionsAndItems{
         $item_redirect = get_post_meta( $post->ID, '_item_redirect', true );
     ?>
         <input type="hidden" id="item_options" name="item_options" value="true" />
+        <?= wp_nonce_field( 'save_item_meta', 'my_item_nonce' ); ?>
     <table class="form-table item-options table-striped">
         <colgroup><col width="20%" /><col width="60%" /><col width="20%" /></colgroup>
         <tr>
@@ -410,13 +411,25 @@ class AuctionItem extends AuctionsAndItems{
      */
     public function save_item_callback( $post_id, $post, $update ){
 
-        // If this isn't an `item` CPT, don't update it.
-        if( $this->slug != $post->post_type )
+        // Bail if not the correct post type
+        if ( $this->slug != $post->post_type ) {
             return;
+        }
 
-        // verify if this is an auto save routine. If it is our form has not been submitted, so we don't want to do anything
-        if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE )
-            return $post_id;
+        // Bail if doing autosave
+        if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+            return;
+        }
+
+        // Check if this is coming from the item edit screen by verifying the nonce
+        if ( ! isset( $_POST['my_item_nonce'] ) || ! wp_verify_nonce( $_POST['my_item_nonce'], 'save_item_meta' ) ) {
+            return;
+        }
+
+        // Check if this is from the admin screen (avoids wp_update_post interference)
+        if ( ! is_admin() ) {
+            return;
+        }
 
         $valid_fields = array( '_lotnum' => '', '_low_est' => '', '_high_est' => '', '_start_price' => '', '_hammerprice' => '', '_realized' => '', '_highlight' => false, '_item_redirect' => 0, '_item_number' => '', '_lot_bidding_url' => '' );
         foreach ( $valid_fields as $field => $default ) {

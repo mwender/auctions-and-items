@@ -159,10 +159,10 @@ class AuctionImporter extends AuctionsAndItems{
 						 *   - [x] Add admin CSS with styling for .alert.alert-warning
 						 *   - [x] Allow editing "Item Number"
 						 *   - [x] Include "Item Number" in admin listing.
-						 *   - [ ] Add `hammerprice`.
-						 *   - [ ] `hammerprice` to become `realizedprice`
+						 *   - [x] Add `hammerprice`.
+						 *   - [x] `hammerprice` to become `realizedprice`
 						 *   - [ ] Update how online bidding URLs work. Just use LotBiddingURL
-						 *   - [ ] Allow editing "Lot Bidding URL".
+						 *   - [x] Allow editing "Lot Bidding URL".
 						 * 
 						 * - Update following code to work with the new required `itemNumber` field.
 						 *   - We don't need to skip image processing below if `itemNumber` is present.
@@ -184,9 +184,16 @@ class AuctionImporter extends AuctionsAndItems{
 						}
 
 						/**
-						 * Skip image processing if we have an ItemNumber.
+						 * Skip image processing if we don't have a Lot Number. This is
+						 * because we find images in the image upload folder based on
+						 * the Lot Number. Without the Lot Number we don't know which
+						 * images to attach to the item.
 						 */
-						if( array_key_exists( 'itemnumber', $item ) && is_numeric( $item['itemnumber'] ) )
+						if( ! array_key_exists( 'lotnumber', $item ) && ! array_key_exists( 'lotnum', $item ) )
+							continue;
+						if( array_key_exists( 'lotnumber', $item ) && ! is_numeric( $item['lotnumber'] ) )
+							continue;
+						if( array_key_exists( 'lotnum', $item ) && ! is_numeric( $item['lotnum'] ) )
 							continue;
 
 						$upload_dir = wp_upload_dir();
@@ -449,6 +456,7 @@ class AuctionImporter extends AuctionsAndItems{
 	 * Returns a list of images prefixed with the given lotnum that are not already WP attachments
 	 */
 	function get_img_from_dir( $post_ID, $lotnum, $imgdir ) {
+		uber_log( "🔔 get_img_from_dir( {$post_ID}, {$lotnum}, {$imgdir} ){}" );
 		$data = [];
 
 		if ( $dh = @dir( $imgdir ) ) {
@@ -561,15 +569,23 @@ class AuctionImporter extends AuctionsAndItems{
 		}
 
 		// Skip items with empty or non-numeric Lot Numbers:
-		if( empty( $item['lotnumber'] ) || ! is_numeric( $item['lotnumber'] ) )
-			return;
+		//if( empty( $item['lotnumber'] ) || ! is_numeric( $item['lotnumber'] ) )
+			//return;
 
 		// if this item exists, add the ID to the query so that it gets updated
+		$id = false;
 		if( $id = $this->auction_object_exists([ 'exists' => 'item', 'itemnumber' => $item['itemnumber'] ]) )
 			$post['ID'] = $id;
 
-		$item_title = 'Lot ' . $item['lotnumber'] . ': ' . $item['lead'];
-		$post['post_title'] = $item_title;
+		$item_title = 'Untitled Lot';
+		if( array_key_exists( 'lotnumber', $item ) && array_key_exists( 'lead', $item ) ){
+			$item_title = 'Lot ' . $item['lotnumber'] . ': ' . $item['lead'];
+			$post['post_title'] = $item_title;			
+		} else if( $id ){
+			$post['post_title'] = get_the_title( $id );
+			$post['post_content'] = get_the_content( null, false,  $id );
+		}
+
 		$post['post_type'] = 'item';
 		$post['post_status'] = 'publish';
 
@@ -600,9 +616,18 @@ class AuctionImporter extends AuctionsAndItems{
 		}
 
 		// Create/Update the Item CPT
-		$id = wp_insert_post( $post );
-		if( ! array_key_exists( 'ID', $post ) || empty( $post['ID'] ) )
-			$post['ID'] = $id;
+		// /**
+		// CONTINUE WORKING HERE: Need to not create a new post
+		// when we are updating. We are losing meta field values.
+		if( array_key_exists( 'ID', $post ) ){
+			$post_id = $post['ID'];
+			$lot_num_before = get_post_meta( $post_id, '_lotnum', true );
+			wp_update_post( $post );
+			$lot_num_after = get_post_meta( $post_id, '_lotnum', true );
+			uber_log( "🔔 Lot no. for Item #{$post_id} CPT:\n - Before: {$lot_num_before}\n - After: {$lot_num_after}" );
+		} else {			
+			$post['ID'] = wp_insert_post( $post );
+		}
 
 		// Add the Item to the Auction
 		wp_set_object_terms( $post['ID'], array( intval( $auction ) ), 'auction' );
@@ -651,6 +676,8 @@ class AuctionImporter extends AuctionsAndItems{
 			}
 		}
 
+		uber_log('🔔 $item = ' . print_r( $item,true ) );
+
 		$meta_fields = [ 
 			'_lotnum' 					=> 'lotnumber',
 			'_low_est' 					=> 'lowestimate',
@@ -661,10 +688,13 @@ class AuctionImporter extends AuctionsAndItems{
 			'_lot_bidding_url' 	=> 'lotbiddingurl',
 		];
 		foreach ( $meta_fields as $meta_key => $item_key ) {
-			if( ! array_key_exists( $item_key, $item ) )
-				continue;
-
-			update_post_meta( $post['ID'], $meta_key, $item[ $item_key ] );
+			if( ! array_key_exists( $item_key, $item ) ){
+				uber_log( "👉 Skipping {$item_key}");
+				// nothing
+			} else {
+				uber_log("Running: update_post_meta( {$post['ID']}, {$meta_key}, {$item[$item_key]} )");
+				update_post_meta( $post['ID'], $meta_key, $item[ $item_key ] );	
+			}
 		}
 
 		if( ! array_key_exists( 'ishighlight', $item ) )

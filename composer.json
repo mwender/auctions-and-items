@@ -6,7 +6,6 @@
         "a5hleyrich/wp-background-processing": "^1.0",
         "zordius/lightncandy": "^1.2"
     },
-    "version": "2.x.x-dev",
     "authors": [
         {
             "name": "Michael Wender",

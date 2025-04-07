@@ -19,7 +19,7 @@ class AuctionsAndItems {
         AuctionsAndItems::init_options();
     }
 
-    public function init_options(){
+    public static function init_options(){
         update_option( 'auctions_and_items_ver', self::VER );
     }
     /**

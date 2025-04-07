@@ -5,7 +5,7 @@
 **Requires at least:** 6.3  
 **Tested up to:** 6.7.2  
 **Requires PHP:** 8.1  
-**Stable tag:** 2.0.0  
+**Stable tag:** 2.0.1  
 **License:** GPLv2 or later  
 **License URI:** https://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -16,6 +16,9 @@ Adds an `Items` CPT along with an `Auction` taxonomy. Together, these provide th
 This plugin supports the display of large, multi-item auctions. Each Item post features a gallery of high-resolution images allowing site visitors to easily view and assess auction items.
 
 ## Changelog ##
+
+### 2.0.1 ###
+* Allowing `AuctionsAndItems::init_options()` to be called statically so as to prevent an error on activation.
 
 ### 2.0.0 ###
 * Auction Importer improvements:

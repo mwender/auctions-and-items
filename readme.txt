@@ -5,7 +5,7 @@ Tags: comments, spam
 Requires at least: 6.3
 Tested up to: 6.7.2
 Requires PHP: 8.1
-Stable tag: 1.9.0
+Stable tag: 2.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -23,6 +23,7 @@ This plugin supports the display of large, multi-item auctions. Each Item post f
 	* The importer now treats columns in a case-insensitive fashion.
 	* Adding "Item No." as a unique key for auction items.
 * Adding "Hammer Price" as Item CPT meta.
+* Checking if Composer autoloader has already been loaded
 
 = 1.9.0 =
 * Adding `LotBiddingURL` option for CSV imports.

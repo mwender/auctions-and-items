@@ -31,7 +31,9 @@ define( 'AAI_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 define( 'AAI_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 
 // Load Composer files
-require 'vendor/autoload.php';
+// 04/07/2025 (10:28) - checking if Composer autoloader has already been loaded:
+if( ! class_exists( 'LightnCandy\\LightnCandy' ) )
+    require 'vendor/autoload.php';
 
 // Load main class
 require_once( 'lib/classes/auctions-and-items.php' );

@@ -117,7 +117,9 @@ class AuctionImporter extends AuctionsAndItems{
 					// Get the folder where this auction's images are stored
 					$imgpath = get_post_meta( $id, '_image_folder', true );
 
-					$csvfile = str_replace( get_bloginfo( 'url' ) . '/', ABSPATH, $url );
+					//$csvfile = str_replace( get_bloginfo( 'url' ) . '/', ABSPATH, $url );
+					$csvfile = get_attached_file( $id );
+					uber_log('🔔🔔🔔 👉 $csvfile = ' . $csvfile );
 
 				  /*
 					 * Open this CSV
@@ -224,7 +226,8 @@ class AuctionImporter extends AuctionsAndItems{
 					$data['url'] = $url;
 					$data['title'] = get_the_title( $id );
 					$data['filename'] = basename( $url );
-					$csvfile = str_replace( get_bloginfo( 'url' ). '/', ABSPATH, $url );
+					//$csvfile = str_replace( get_bloginfo( 'url' ). '/', ABSPATH, $url );
+					$csvfile = get_attached_file( $id );
 					$data['filepath'] = $csvfile;
 					$data['csv'] = $this->open_csv( $csvfile, $id, false );
 					$data['imgpath'] = get_post_meta( $id, '_image_folder', true );
@@ -641,9 +644,13 @@ class AuctionImporter extends AuctionsAndItems{
 				foreach ( $item_tags as $tag ) {
 					if( $term = term_exists( $tag, 'item_tags' ) ){
 						$terms[ $term['term_id'] ] = $tag;
-					} else {
+					} else if( ! empty( $tag ) ) {
 						$term = wp_insert_term( $tag, 'item_tags' );
-						$terms[ $term['term_id'] ] = $tag;
+						if( ! is_wp_error( $term ) ){
+							$terms[ $term['term_id'] ] = $tag;
+						} else {
+							uber_log('🟥 Tag creation failed with Error Code `' . $term->get_error_code() . '`: ' . $term->get_error_message() );
+						}
 					}
 				}
 				$term_ids = array_keys( $terms );
@@ -663,9 +670,14 @@ class AuctionImporter extends AuctionsAndItems{
 				foreach ( $item_categories as $category ) {
 					if( $term = term_exists( $category, 'item_category' ) ){
 						$terms[$term['term_id']] = $category;
-					} else {
+					} else if( ! empty( $category ) ) {
 						$term = wp_insert_term( $category, 'item_category' );
-						$terms[$term['term_id']] = $category;
+						if( ! is_wp_error( $term ) ){
+							$terms[$term['term_id']] = $category;	
+						} else {
+							uber_log('🟥 Tag creation failed with Error Code `' . $term->get_error_code() . '`: ' . $term->get_error_message() );
+						}
+						
 					}
 				}
 				$term_ids = array_keys( $terms );
@@ -797,8 +809,9 @@ class AuctionImporter extends AuctionsAndItems{
 	 * already stored in a transient (identified by `$csvID`), it retrieves the cached data instead
 	 * of reprocessing the file.
 	 *
-	 * @param string $csvfile Path to the CSV file.
-	 * @param string|null $csvID Unique identifier for storing/retrieving the transient data.
+	 * @param string      $csvfile Path to the CSV file.
+	 * @param string|null $csvID   Unique identifier for storing/retrieving the transient data.
+	 * @param bool        $cached  Whether to use the cached version (default true).
 	 * @return array Processed CSV data, including an error message if no CSV file is specified.
 	 *
 	 * @structure array $csv The processed CSV data stored in the transient:
@@ -807,44 +820,76 @@ class AuctionImporter extends AuctionsAndItems{
 	 *     - `columns` (array) An indexed array of column headers.
 	 *     - `rows` (array) A multidimensional array containing CSV row data.
 	 *     - `error` (string) An error message if no CSV is specified.
-	 */	
+	 */
 	public function open_csv( $csvfile = '', $csvID = null, $cached = true ) {
-		if( empty( $csvfile ) )
-			return $csv['error'] = 'No CSV specified!';
+		uber_log('🔔 Running open_csv()...');
+	  if ( empty( $csvfile ) ) {
+	    return array( 'error' => 'No CSV specified!' );
+	  }
 
-		if( false == $cached || false === ( $csv = get_transient( 'csv_' . $csvID ) ) ) {
-			$csv = array( 'row_count' => 0, 'column_count' => 0, 'columns' => array(), 'rows' => array() );
-			if ( !empty( $csvfile ) && file_exists( $csvfile ) ) {
-				if ( ( $handle = @fopen( $csvfile, 'r' ) ) !== false ) {
-					$x = 0;
-					while ( $row = fgetcsv( $handle, 2048, ',' ) ) {
-						if ( $x == 0 ) {
-							// trim spaces from column headings
-							foreach( $row as $key => $heading ){
-								$row[$key] = trim( $heading );
-							}
-							$csv['columns'] = $row;
-						} else {
-							array_walk( $row, array( $this, 'trim_csv_row' ) );
-							$csv['rows'][] = $row;
-							$csv['row_count']++;
-						}
-						$x++;
-					}
-					$csv['column_count'] = count( $csv['columns'] );
-				}
-			}
-			set_transient( 'csv_' . $csvID, $csv );
-		}
+	  if ( false === $cached || false === ( $csv = get_transient( 'csv_' . $csvID ) ) ) {
+	    $csv = array(
+	      'row_count'     => 0,
+	      'column_count'  => 0,
+	      'columns'       => array(),
+	      'rows'          => array(),
+	    );
 
-		return $csv;
+	    uber_log('🔔 $csvfile = ' . $csvfile );
+
+	    if ( file_exists( $csvfile ) ) {
+	      // Normalize file encoding to UTF-8
+	      $file_contents = file_get_contents( $csvfile );
+	      $encoding      = mb_detect_encoding( $file_contents, 'UTF-8, ISO-8859-1, Windows-1252', true );
+	      $file_contents = mb_convert_encoding( $file_contents, 'UTF-8', $encoding );
+	      $file_contents = preg_replace( "/\r\n|\r/", "\n", $file_contents ); // Normalize line endings
+
+	      // Write to temp file
+	      $temp_file = tmpfile();
+	      fwrite( $temp_file, $file_contents );
+	      $meta      = stream_get_meta_data( $temp_file );
+	      $csv_path  = $meta['uri'];
+
+	      uber_log('🔔 $csv_path = ' . $csv_path );
+
+	      if ( ( $handle = fopen( $csv_path, 'r' ) ) !== false ) {
+	        $x = 0;
+	        while ( ( $row = fgetcsv( $handle, 0, ',', '"' ) ) !== false ) {
+	          if ( $x === 0 ) {
+	            foreach ( $row as $key => $heading ) {
+	              $row[ $key ] = trim( $heading );
+	            }
+	            $csv['columns'] = $row;
+	          } else {
+	            array_walk( $row, array( $this, 'trim_csv_row' ) );
+	            $csv['rows'][] = $row;
+	            $csv['row_count']++;
+	          }
+	          $x++;
+	        }
+	        $csv['column_count'] = count( $csv['columns'] );
+	        fclose( $handle );
+	      }
+
+	      fclose( $temp_file ); // Clean up temp file
+	    } else {
+	    	uber_log('🟥 FILE NOT FOUND!');
+	    }
+
+	    set_transient( 'csv_' . $csvID, $csv );
+	  }
+
+	  return $csv;
 	}
 
 	/**
-	 * Trim spaces from CSV column values
+	 * Callback to sanitize and decode individual CSV values.
+	 *
+	 * @param string $value CSV cell value, passed by reference.
 	 */
-	function trim_csv_row( &$value, $key ){
-		$value = htmlentities( utf8_encode( trim( $value ) ), ENT_QUOTES, 'UTF-8' );
+	public function trim_csv_row( &$value ) {
+	  $value = trim( $value );
+	  $value = html_entity_decode( $value, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
 	}
 }
 

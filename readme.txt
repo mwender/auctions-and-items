@@ -5,7 +5,7 @@ Tags: comments, spam
 Requires at least: 6.3
 Tested up to: 6.7.2
 Requires PHP: 8.1
-Stable tag: 2.1.1
+Stable tag: 2.1.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -16,6 +16,9 @@ Adds an `Items` CPT along with an `Auction` taxonomy. Together, these provide th
 This plugin supports the display of large, multi-item auctions. Each Item post features a gallery of high-resolution images allowing site visitors to easily view and assess auction items.
 
 == Changelog ==
+
+= 2.1.1.1 =
+* Updating `id` value to `auction-importer-upload-instructions-help` so that "Upload Instructions" section will load for "Import Auction" contextual help.
 
 = 2.1.1 =
 * Adding "Upload Instructions" documentation.

@@ -437,7 +437,7 @@ class AuctionImporter extends AuctionsAndItems{
 		) );
 
     	$screen->add_help_tab( array(
-    		'id' => 'auction-importer-ftp-permissions-help',
+    		'id' => 'auction-importer-upload-instructions-help',
     		'title' => 'Upload Instructions',
     		'content' => file_get_contents( plugin_dir_path( __FILE__ ) . '../html/help.auction-importer.upload-instructions.html' ),
 		) );

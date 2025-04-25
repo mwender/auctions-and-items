@@ -4,7 +4,7 @@
 	Plugin URI:
 	Description: Adds an `auction` taxonomy with `Item` custom post_types.
 	Author: Michael Wender
-	Version: 2.1.0
+	Version: 2.1.1
 	Author URI: http://michaelwender.com
  */
 /*  Copyright 2015-24  Michael Wender  (email : michael@michaelwender.com)

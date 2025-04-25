@@ -438,6 +438,12 @@ class AuctionImporter extends AuctionsAndItems{
 
     	$screen->add_help_tab( array(
     		'id' => 'auction-importer-ftp-permissions-help',
+    		'title' => 'Upload Instructions',
+    		'content' => file_get_contents( plugin_dir_path( __FILE__ ) . '../html/help.auction-importer.upload-instructions.html' ),
+		) );
+
+    	$screen->add_help_tab( array(
+    		'id' => 'auction-importer-ftp-permissions-help',
     		'title' => 'FTP Permissions',
     		'content' => file_get_contents( plugin_dir_path( __FILE__ ) . '../html/help.auction-importer.ftp-permissions.html' ),
 		) );
@@ -605,11 +611,11 @@ class AuctionImporter extends AuctionsAndItems{
 
 		/**
 		 * ⚠️ "NO LOT" Line Items
-		 * 
-		 * This "No Lot" in $item_title implies to me (i.e. MWENDER) that we DO NOT have
-		 * a lot number for this item. However, above we are skipping items without a 
-		 * `lotnumber`. So it would appear that the following code would never run unless 
-		 * we are adding "fake" `lotnumber`s to the CSV. True?
+		 *
+		 * The following code complies with the instructions found in the "Removing Items"
+		 * contextual help. In /lib/html/help.auction-importer/removing-items.html, we 
+		 * state, "Adding `NO LOT` anywhere in the title of an item will set that item to 
+		 * `DRAFT` status, thereby removing it from public display."
 		 * 
 		 **/
 		$valid_nolot_strings = array( 'no lot', 'nolot', 'no-lot' );

@@ -462,6 +462,18 @@ class AuctionImporter extends AuctionsAndItems{
     }
 
 	/**
+	 * Cleans a USD-formatted currency string to a numeric value.
+	 *
+	 * @param string $value The currency string (e.g., "$1,651.25").
+	 * @return float The numeric value.
+	 */
+	function clean_usd( $value ) {
+	  $clean = str_replace( [ '$', ',' ], '', $value );
+	  return (float) $clean;
+	}
+
+
+	/**
 	 * Returns a list of images prefixed with the given lotnum that are not already WP attachments
 	 */
 	function get_img_from_dir( $post_ID, $lotnum, $imgdir ) {
@@ -633,8 +645,9 @@ class AuctionImporter extends AuctionsAndItems{
 			$lot_num_before = get_post_meta( $post_id, '_lotnum', true );
 			wp_update_post( $post );
 			$lot_num_after = get_post_meta( $post_id, '_lotnum', true );
-			uber_log( "🔔 Lot no. for Item #{$post_id} CPT:\n - Before: {$lot_num_before}\n - After: {$lot_num_after}" );
-		} else {			
+			uber_log( "🔔 Lot no. for Item CPT post_id #{$post_id} :\n - Before: {$lot_num_before}\n - After: {$lot_num_after}\nEdit link: " . get_edit_post_link( $post_id, 'raw' ) );
+		} else {
+			uber_log('⚠️ New Item post created!');			
 			$post['ID'] = wp_insert_post( $post );
 		}
 
@@ -707,18 +720,24 @@ class AuctionImporter extends AuctionsAndItems{
 		];
 		foreach ( $meta_fields as $meta_key => $item_key ) {
 			if( ! array_key_exists( $item_key, $item ) ){
-				uber_log( "👉 Skipping {$item_key}");
+				//uber_log( "👉 Skipping {$item_key}");
 				// nothing
 			} else {
-				uber_log("Running: update_post_meta( {$post['ID']}, {$meta_key}, {$item[$item_key]} )");
-				update_post_meta( $post['ID'], $meta_key, $item[ $item_key ] );	
+				
+
+				$item_value = $item[ $item_key ];
+				$format_usd_values = array( 'lowestimate', 'highestimate', 'realized', 'hammerprice' );
+				if( in_array( $item_key, $format_usd_values ) )
+					$item_value = $this->clean_usd( $item[ $item_key ] );
+				update_post_meta( $post['ID'], $meta_key, $item_value );
+				uber_log("🟩 update_post_meta( {$post['ID']}, {$meta_key}, {$item_value} )");	
 			}
 		}
 
-		if( ! array_key_exists( 'ishighlight', $item ) )
-			$item['ishighlight'] = false;
-		$highlight = boolval( $item['ishighlight'] );
-		update_post_meta( $post['ID'], '_highlight', $highlight );
+		if( array_key_exists( 'ishighlight', $item ) ){
+			$highlight = ( 'yes' == strtolower( $item['ishighlight'] ) || 'true' == strtolower( $item['ishighlight'] ) )? true : false ;
+			update_post_meta( $post['ID'], '_highlight', $highlight );
+		}
 
 		/**
 		 * IGAVEL AUCTION LINKS
@@ -828,7 +847,7 @@ class AuctionImporter extends AuctionsAndItems{
 	 *     - `error` (string) An error message if no CSV is specified.
 	 */
 	public function open_csv( $csvfile = '', $csvID = null, $cached = true ) {
-		uber_log('🔔 Running open_csv()...');
+		//uber_log('🔔 Running open_csv()...');
 	  if ( empty( $csvfile ) ) {
 	    return array( 'error' => 'No CSV specified!' );
 	  }

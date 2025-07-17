@@ -4,7 +4,7 @@
 	Plugin URI:
 	Description: Adds an `auction` taxonomy with `Item` custom post_types.
 	Author: Michael Wender
-	Version: 2.1.2
+	Version: 2.1.3
 	Author URI: http://michaelwender.com
  */
 /*  Copyright 2015-24  Michael Wender  (email : michael@michaelwender.com)
@@ -40,8 +40,36 @@ require_once( 'lib/classes/auctions-and-items.php' );
 $AuctionsAndItems = AuctionsAndItems::get_instance();
 register_activation_hook( __FILE__, array( $AuctionsAndItems, 'activate' ) );
 
-//add_action( 'wp_enqueue_scripts', array( $AuctionsAndItems, 'register_scripts' ), 9 );
-//add_action( 'wp_enqueue_scripts', array( $AuctionsAndItems, 'enqueue_scripts' ), 10 );
+/**
+ * Adds custom metadata links to the Auctions plugin row in the Plugins screen.
+ *
+ * Displays a "local" badge when running the local development version, and
+ * appends links to the changelog and the package name.
+ *
+ * @since 2.1.3
+ *
+ * @param string[] $links An array of the plugin's metadata links.
+ * @param string   $file  Path to the plugin file relative to the plugins directory.
+ * @return string[] Modified array of metadata links.
+ */
+add_filter( 'plugin_row_meta', function( $links, $file ) {
+  
+  if ( strpos( $file, 'auctions.php' ) !== false ) {
+    
+    // Check if we're running the local dev version:
+    $plugin_dir = plugin_dir_path( __FILE__ );
+    
+    if ( strpos( $plugin_dir, 'localdev' ) !== false ) {
+      array_unshift( $links, '<span style="padding:2px 8px; background:#0073aa; color:#fff; border-radius:10px; font-size:11px;">local</span> ' );;
+    }
+
+    $links[] = '<a href="https://github.com/mwender/auctions-and-items?tab=readme-ov-file#changelog" target="_blank">Changelog</a>';
+    $links[] = '<code>mwender/auctions-and-items</code>';
+  }
+
+  return $links;
+
+}, 10, 2 );
 
 /**
  * Add a custom hook 'aai_empty_trash', this hook runs when

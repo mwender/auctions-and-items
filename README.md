@@ -5,7 +5,7 @@
 **Requires at least:** 6.3  
 **Tested up to:** 6.7.2  
 **Requires PHP:** 8.1  
-**Stable tag:** 2.1.3  
+**Stable tag:** 3.0.0  
 **License:** GPLv2 or later  
 **License URI:** https://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -16,6 +16,10 @@ Adds an `Items` CPT along with an `Auction` taxonomy. Together, these provide th
 This plugin supports the display of large, multi-item auctions. Each Item post features a gallery of high-resolution images allowing site visitors to easily view and assess auction items.
 
 ## Changelog ##
+
+### 3.0.0 ###
+* Breaking change: Renaming root file to match WordPress naming conventions (auctions.php to auctions-and-items.php). After you update this plugin, it will be deactivated in the WordPress admin. You will need to reactivate it.
+* Updating plugin author meta data.
 
 ### 2.1.3 ###
 * Adding custom meta data links to the plugin's display in the WordPress Plugins admin listing.

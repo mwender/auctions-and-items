@@ -5,9 +5,9 @@
 	Description: Adds an `auction` taxonomy with `Item` custom post_types.
 	Author: Michael Wender
 	Version: 2.1.3
-	Author URI: http://michaelwender.com
+	Author URI: https://mwender.com
  */
-/*  Copyright 2015-24  Michael Wender  (email : michael@michaelwender.com)
+/*  Copyright 2015-25  Michael Wender  (email : mwender@wenmarkdigital.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License, version 2, as

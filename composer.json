@@ -1,7 +1,7 @@
 {
     "name": "mwender/auctions-and-items",
     "description": "WordPress plugin for Auctions with Item CPTs.",
-    "version": "3.0.0",
+    "version": "3.0.1",
     "type": "wordpress-plugin",
     "require": {
         "a5hleyrich/wp-background-processing": "^1.0",
